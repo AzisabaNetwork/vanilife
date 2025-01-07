@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.3-R0.1-SNAPSHOT")
+    compileOnly("com.tksimeji:visualkit:0.5.1")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }
 
