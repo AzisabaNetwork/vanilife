@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.1.20-Beta2"
+    kotlin("plugin.serialization") version "2.1.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -19,6 +20,8 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.mongodb:mongodb-driver-sync:5.3.0")
+    implementation("com.charleskorn.kaml:kaml:0.70.0")
 }
 
 val targetJavaVersion = 21
