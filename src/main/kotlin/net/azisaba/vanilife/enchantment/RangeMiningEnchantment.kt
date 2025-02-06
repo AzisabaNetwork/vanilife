@@ -35,7 +35,7 @@ object RangeMiningEnchantment: ToolEnchantment {
         get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
 
     override val exclusives: Set<Keyed>
-        get() = setOf(Enchantments.BULK_MINING, Enchantment.FORTUNE.key)
+        get() = setOf(Enchantments.BLAST_FURNACE, Enchantments.BULK_MINING, Enchantment.FORTUNE.key, Enchantment.SILK_TOUCH.key)
 
     override fun use(event: BlockBreakEvent) {
         val player = event.player

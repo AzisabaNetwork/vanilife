@@ -57,7 +57,7 @@ object BulkMiningEnchantment: ToolEnchantment {
         get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
 
     override val exclusives: Set<Keyed>
-        get() = setOf(Enchantments.RANGE_MINING, Enchantment.FORTUNE.key, Enchantment.SILK_TOUCH.key)
+        get() = setOf(Enchantments.BLAST_FURNACE, Enchantments.RANGE_MINING, Enchantment.FORTUNE.key)
 
     override fun use(event: BlockBreakEvent) {
         val block = event.block.takeIf { ORES.contains(it.type) } ?: return
