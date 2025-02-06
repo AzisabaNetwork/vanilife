@@ -10,6 +10,7 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
 import com.mongodb.connection.ConnectionPoolSettings
 import net.azisaba.vanilife.kaml.Config
+import net.azisaba.vanilife.listener.BlockListener
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.TimeUnit
@@ -52,6 +53,8 @@ class Vanilife : JavaPlugin() {
 
         mongo = MongoClients.create(mongoClientSettings)
         database = mongo.getDatabase(pluginConfig.database.name)
+
+        server.pluginManager.registerEvents(BlockListener, this)
     }
 
     override fun onDisable() {
