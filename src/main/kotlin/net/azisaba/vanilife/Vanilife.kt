@@ -9,6 +9,8 @@ import java.io.File
 
 class Vanilife : JavaPlugin() {
     companion object {
+        const val PLUGIN_ID = "vanilife"
+
         lateinit var plugin: Vanilife
 
         lateinit var pluginConfig: Config
