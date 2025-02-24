@@ -25,10 +25,12 @@ fun Player.sendInfo(message: Component) {
         .append(message))
 }
 
-val World.cluster: Cluster
-    get() {
-        TODO("Not yet implemented")
-    }
+val World.cluster: Cluster?
+    get() = Cluster.all().firstOrNull { it.contains(this) }
+
+fun World.hasCluster(): Boolean {
+    return cluster != null
+}
 
 val World.Environment.name: String
     get() = when (this) {
