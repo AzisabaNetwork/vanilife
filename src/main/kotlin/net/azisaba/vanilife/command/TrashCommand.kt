@@ -7,8 +7,8 @@ import io.papermc.paper.command.brigadier.Commands
 import net.azisaba.vanilife.gui.TrashGUI
 import org.bukkit.entity.Player
 
-object TrashCommand {
-    fun create(): LiteralArgumentBuilder<CommandSourceStack> {
+object TrashCommand: CommandCreator {
+    override fun create(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("trash")
             .requires { it.sender is Player }
             .executes { ctx ->

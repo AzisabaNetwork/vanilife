@@ -7,3 +7,12 @@ dependencies:
   server:
     Visualkit:
       load: AFTER
+permissions:
+  vanilife.*:
+    description: 'This permission includes all Vanilife permissions.'
+    default: op
+    children:
+      vanilife.reload: true
+  vanilife.reload:
+    description: 'This permission allows reloading of Vanilife.'
+    default: op
