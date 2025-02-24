@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Config(
-    val database: Database
+    val database: Database,
+    val randomTeleport: RandomTeleport = RandomTeleport()
 )
