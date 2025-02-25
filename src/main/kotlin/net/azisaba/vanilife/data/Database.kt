@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Database(
-    val host: String,
-    val port: Int
+    val url: String = "jdbc:mariadb://localhost:3306/vanilife",
+    val usernameEnv: String = "DATABASE_USER",
+    val passwordEnv: String = "DATABASE_PASSWORD",
+    val maxPoolSize: Int = 10
 )
