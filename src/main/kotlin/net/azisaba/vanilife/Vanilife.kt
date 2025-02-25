@@ -5,6 +5,7 @@ import com.charleskorn.kaml.decodeFromStream
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.data.Config
+import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.vwm.Cluster
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -56,9 +57,11 @@ class Vanilife : JavaPlugin() {
         saveDefaultConfig()
         reloadPluginConfig()
 
-        createTableIfNotExists("cluster", ":uuid VARCHAR(36) PRIMARY KEY, year SMALLINT UNSIGNED, season VARCHAR(6), overworld VARCHAR(32), the_nether VARCHAR(32), the_end VARCHAR(32)")
+        createTableIfNotExists("cluster", ":uuid VARCHAR(36) PRIMARY KEY, year SMALLINT UNSIGNED, season VARCHAR(6), overworld VARCHAR(32) PRIMARY KEY, the_nether VARCHAR(32) PRIMARY KEY, the_end VARCHAR(32) PRIMARY KEY")
 
         Cluster.init()
+
+        HudRunnable.runTaskTimerAsynchronously(this, 0L, 1L)
     }
 
     override fun onDisable() {

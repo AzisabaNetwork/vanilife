@@ -15,6 +15,11 @@ fun runWithCooldown(any: Any, player: Player, cooldown: Long = 20L * 60, runnabl
 
     val remaining = cooldownMap[key] ?: run {
         runnable.run()
+
+        if (player.isOp && player.gameMode.isInvulnerable) {
+            return
+        }
+
         cooldownMap[key] = cooldown
 
         object : BukkitRunnable() {
