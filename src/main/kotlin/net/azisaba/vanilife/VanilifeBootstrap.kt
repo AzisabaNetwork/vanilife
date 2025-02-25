@@ -6,6 +6,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
 import net.azisaba.vanilife.command.RandomTeleportCommand
 import net.azisaba.vanilife.command.TrashCommand
 import net.azisaba.vanilife.command.VanilifeCommand
+import net.azisaba.vanilife.command.VwmCommand
 
 class VanilifeBootstrap: PluginBootstrap {
     override fun bootstrap(ctx: BootstrapContext) {
@@ -13,6 +14,7 @@ class VanilifeBootstrap: PluginBootstrap {
             commands.registrar().register(VanilifeCommand.create().build())
             commands.registrar().register(RandomTeleportCommand.create().build(), setOf("rtp"))
             commands.registrar().register(TrashCommand.create().build())
+            commands.registrar().register(VwmCommand.create().build())
         })
     }
 }

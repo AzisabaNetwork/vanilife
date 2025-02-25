@@ -31,11 +31,3 @@ val World.cluster: Cluster?
 fun World.hasCluster(): Boolean {
     return cluster != null
 }
-
-val World.Environment.name: String
-    get() = when (this) {
-        World.Environment.NORMAL -> "normal"
-        World.Environment.NETHER -> "the_nether"
-        World.Environment.THE_END -> "the_end"
-        World.Environment.CUSTOM -> "custom"
-    }
