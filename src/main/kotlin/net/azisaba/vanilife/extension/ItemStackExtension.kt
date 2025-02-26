@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-fun ItemStack(item: Item, amount: Int): ItemStack {
+fun ItemStack(item: Item, amount: Int = 1): ItemStack {
     val itemStack = item.type.createItemStack(amount)
     val itemMeta = itemStack.itemMeta
 
