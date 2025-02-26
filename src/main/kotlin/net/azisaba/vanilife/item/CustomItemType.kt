@@ -5,7 +5,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
-interface Item: Keyed {
+interface CustomItemType: Keyed {
     val type: ItemType
 
     val title: Component

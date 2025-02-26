@@ -32,8 +32,8 @@ interface Cluster: Iterable<World> {
 
         fun init() {
             Vanilife.dataSource.connection.use { connection ->
-                connection.prepareStatement("SELECT * FROM cluster").use { statement ->
-                    statement.executeQuery().use { resultSet ->
+                connection.prepareStatement("SELECT * FROM cluster").use { preparedStatement ->
+                    preparedStatement.executeQuery().use { resultSet ->
                         while (resultSet.next()) {
                             create(resultSet.getString("uuid").toUuid(),
                                 Year.of(resultSet.getInt("year")),
@@ -53,14 +53,14 @@ interface Cluster: Iterable<World> {
                 instances.add(it)
 
                 Vanilife.dataSource.connection.use { connection ->
-                    connection.prepareStatement("INSERT INTO cluster VALUES(?, ?, ?, ?, ?, ?)").use { statement ->
-                        statement.setString(1, it.uuid.toString())
-                        statement.setInt(2, year.value)
-                        statement.setString(3, season.name.lowercase())
-                        statement.setString(4, it.overworld.key.asString())
-                        statement.setString(5, it.theNether.key.asString())
-                        statement.setString(6, it.theEnd.key.asString())
-                        statement.executeUpdate()
+                    connection.prepareStatement("INSERT INTO cluster VALUES(?, ?, ?, ?, ?, ?)").use { preparedStatement ->
+                        preparedStatement.setString(1, it.uuid.toString())
+                        preparedStatement.setInt(2, year.value)
+                        preparedStatement.setString(3, season.name.lowercase())
+                        preparedStatement.setString(4, it.overworld.key.asString())
+                        preparedStatement.setString(5, it.theNether.key.asString())
+                        preparedStatement.setString(6, it.theEnd.key.asString())
+                        preparedStatement.executeUpdate()
                     }
                 }
             }

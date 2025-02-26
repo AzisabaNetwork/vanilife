@@ -2,16 +2,16 @@ package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.extension.ItemStack
-import net.azisaba.vanilife.registry.Items
+import net.azisaba.vanilife.registry.ItemTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 
-abstract class BillItem(final override val price: Int): Item, Priced {
+abstract class BillItemType(final override val price: Int): CustomItemType, Priced {
     companion object {
         val types
-            get() = linkedMapOf(Pair(1000, Items.BILL_1000), Pair(5000, Items.BILL_5000), Pair(10000, Items.BILL_10000))
+            get() = linkedMapOf(Pair(1000, ItemTypes.BILL_1000), Pair(5000, ItemTypes.BILL_5000), Pair(10000, ItemTypes.BILL_10000))
 
         fun createItemStacks(amount: Int): Collection<ItemStack> {
             val itemStacks = mutableListOf<ItemStack>()
@@ -30,9 +30,9 @@ abstract class BillItem(final override val price: Int): Item, Priced {
 
             for ((billType, stackSize) in stackSizeMap) {
                 val item = when (billType) {
-                    1000 -> Items.BILL_1000
-                    5000 -> Items.BILL_5000
-                    10000 -> Items.BILL_10000
+                    1000 -> ItemTypes.BILL_1000
+                    5000 -> ItemTypes.BILL_5000
+                    10000 -> ItemTypes.BILL_10000
                     else -> throw IllegalStateException()
                 }
 

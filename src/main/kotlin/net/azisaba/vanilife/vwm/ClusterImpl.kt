@@ -32,9 +32,15 @@ internal class ClusterImpl(
         File(name).deleteRecursively()
 
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("DELETE FROM cluster WHERE uuid = ?").use { statement ->
-                statement.setString(1, uuid.toString())
-                statement.executeUpdate()
+            connection.prepareStatement("DELETE FROM cluster WHERE uuid = ?").use { preparedStatement ->
+                preparedStatement.setString(1, uuid.toString())
+                preparedStatement.executeUpdate()
+            }
+            connection.prepareStatement("DELETE FROM block WHERE world = ? OR world = ? OR world = ?").use { preparedStatement ->
+                preparedStatement.setString(1, overworld.key.asString())
+                preparedStatement.setString(2, theNether.key.asString())
+                preparedStatement.setString(3, theEnd.key.asString())
+                preparedStatement.executeUpdate()
             }
         }
     }

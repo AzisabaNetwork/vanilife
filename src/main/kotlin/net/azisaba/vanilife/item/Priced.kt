@@ -1,5 +1,5 @@
 package net.azisaba.vanilife.item
 
-interface Priced: Item {
+interface Priced: CustomItemType {
     val price: Int
 }

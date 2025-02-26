@@ -1,8 +1,8 @@
 package net.azisaba.vanilife.extension
 
 import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.item.Item
-import net.azisaba.vanilife.registry.Items
+import net.azisaba.vanilife.item.CustomItemType
+import net.azisaba.vanilife.registry.ItemTypes
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.NamespacedKey
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-fun ItemStack(item: Item, amount: Int = 1): ItemStack {
+fun ItemStack(item: CustomItemType, amount: Int = 1): ItemStack {
     val itemStack = item.type.createItemStack(amount)
     val itemMeta = itemStack.itemMeta
 
@@ -46,11 +46,11 @@ fun ItemStack(item: Item, amount: Int = 1): ItemStack {
     return itemStack.also { it.itemMeta = itemMeta }
 }
 
-val ItemStack.item: Item?
+val ItemStack.customItemType: CustomItemType?
     get() {
         val key = (persistentDataContainer.get(NamespacedKey(Vanilife.PLUGIN_ID, "item"), PersistentDataType.STRING) ?: return null).toKey()
-        return Items.get(key)
+        return ItemTypes.get(key)
     }
 
-val ItemStack.isItem: Boolean
-    get() = item != null
+val ItemStack.isCustomItem: Boolean
+    get() = customItemType != null

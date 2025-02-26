@@ -9,8 +9,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType
 import net.azisaba.vanilife.extension.ItemStack
-import net.azisaba.vanilife.item.Item
-import net.azisaba.vanilife.registry.Items
+import net.azisaba.vanilife.item.CustomItemType
+import net.azisaba.vanilife.registry.ItemTypes
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.inventory.ItemStack
@@ -24,12 +24,12 @@ object ItemStackArgumentType: CustomArgumentType<ItemStack, Key> {
 
     override fun parse(reader: StringReader): ItemStack {
         val input = nativeType.parse(reader)
-        val itemTypes = Registry.ITEM.union(Items.values)
+        val itemTypes = Registry.ITEM.union(ItemTypes.values)
         val itemType = itemTypes.firstOrNull { it.key() == input } ?: throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownArgument().create()
 
         if (itemType is ItemType) {
             return itemType.createItemStack()
-        } else if (itemType is Item) {
+        } else if (itemType is CustomItemType) {
             return ItemStack(itemType)
         }
 
@@ -44,7 +44,7 @@ object ItemStackArgumentType: CustomArgumentType<ItemStack, Key> {
 
             val input = builder.remainingLowerCase
 
-            for (item in Items.values.filter { it.key.namespace().startsWith(input) || it.key.value().startsWith(input) }) {
+            for (item in ItemTypes.values.filter { it.key.namespace().startsWith(input) || it.key.value().startsWith(input) }) {
                 builder.suggest(item.key.asString())
             }
 

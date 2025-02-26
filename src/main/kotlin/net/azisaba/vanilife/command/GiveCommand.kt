@@ -9,8 +9,8 @@ import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
 import net.azisaba.vanilife.extension.giveItemStack
-import net.azisaba.vanilife.extension.isItem
-import net.azisaba.vanilife.extension.item
+import net.azisaba.vanilife.extension.isCustomItem
+import net.azisaba.vanilife.extension.customItemType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.inventory.ItemStack
@@ -37,7 +37,7 @@ object GiveCommand: CommandCreator {
 
         val sender = ctx.source.sender
         val itemTypeName = Component.text().append(Component.text("[")
-            .append(if (itemStack.isItem) itemStack.item!!.title else Component.translatable(itemStack))
+            .append(if (itemStack.isCustomItem) itemStack.customItemType!!.title else Component.translatable(itemStack))
             .append(Component.text("]")))
 
         if (1 < targets.size) {

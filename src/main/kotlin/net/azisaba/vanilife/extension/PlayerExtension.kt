@@ -2,7 +2,7 @@ package net.azisaba.vanilife.extension
 
 import net.azisaba.vanilife.font.DefaultFont
 import net.azisaba.vanilife.font.HudFont
-import net.azisaba.vanilife.item.BillItem
+import net.azisaba.vanilife.item.BillItemType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -14,21 +14,21 @@ var Player.money: Int
     get() {
         return inventory.contents
             .filterNotNull()
-            .filter { it.item is BillItem }
-            .sumOf { (it.item as BillItem).price * it.amount }
+            .filter { it.customItemType is BillItemType }
+            .sumOf { (it.customItemType as BillItemType).price * it.amount }
     }
     set(value) {
         if (money <= value) {
-            giveItemStack(*BillItem.createItemStacks(value - money).toTypedArray())
+            giveItemStack(*BillItemType.createItemStacks(value - money).toTypedArray())
             return
         }
 
         val differance = money - value
         var paid = 0
 
-        for (bill in BillItem.types) {
+        for (bill in BillItemType.types) {
             for (itemStack in inventory.filterNotNull()) {
-                if (itemStack.item != bill.value) {
+                if (itemStack.customItemType != bill.value) {
                     continue
                 }
 
