@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 object PlayerListener: Listener {
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (! event.hasBlock()) {
+        if (! event.hasBlock() || ! event.clickedBlock!!.isSolid) {
             return
         }
 

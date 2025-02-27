@@ -5,6 +5,8 @@ bootstrapper: net.azisaba.vanilife.VanilifeBootstrap
 api-version: '1.21'
 dependencies:
   server:
+    packetevents:
+      load: AFTER
     Visualkit:
       load: AFTER
 permissions:

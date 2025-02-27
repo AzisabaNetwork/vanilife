@@ -2,10 +2,14 @@ package net.azisaba.vanilife
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.decodeFromStream
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.listener.BlockListener
+import net.azisaba.vanilife.listener.PacketListener
 import net.azisaba.vanilife.listener.PlayerListener
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
@@ -53,16 +57,23 @@ class Vanilife : JavaPlugin() {
         }
     }
 
+    override fun onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this))
+        PacketEvents.getAPI().load()
+        PacketEvents.getAPI().eventManager.registerListener(PacketListener, PacketListenerPriority.NORMAL)
+    }
+
     override fun onEnable() {
         plugin = this
 
         saveDefaultConfig()
         reloadPluginConfig()
 
-        createTableIfNotExists("block", ":type VARCHAR(64) NOT NULL, world VARCHAR(32) NOT NULL, x INT NOT NULL, y INT NOT NULL, z INT NOT NULL")
+        createTableIfNotExists("block", ":type VARCHAR(64) NOT NULL, pdc JSON, world VARCHAR(32) NOT NULL, x INT NOT NULL, y INT NOT NULL, z INT NOT NULL, CHECK(JSON_VALID(pdc))")
         createTableIfNotExists("cluster", ":uuid VARCHAR(36) PRIMARY KEY, year SMALLINT UNSIGNED NOT NULL, season VARCHAR(6) NOT NULL, overworld VARCHAR(32) PRIMARY KEY, the_nether VARCHAR(32) PRIMARY KEY, the_end VARCHAR(32) PRIMARY KEY")
 
         Cluster.init()
+        PacketEvents.getAPI().init()
 
         HudRunnable.runTaskTimerAsynchronously(this, 0L, 1L)
 
@@ -72,5 +83,6 @@ class Vanilife : JavaPlugin() {
 
     override fun onDisable() {
         dataSource.close()
+        PacketEvents.getAPI().terminate()
     }
 }

@@ -1,5 +1,7 @@
 package net.azisaba.vanilife.extension
 
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.block.CustomBlockType
 import net.azisaba.vanilife.registry.BlockTypes
@@ -38,15 +40,53 @@ var Block.customBlockType: CustomBlockType?
                     preparedStatement.executeUpdate()
                 }
             } else {
-                connection.prepareStatement("INSERT INTO block VALUES(?, ?, ?, ?, ?)").use { preparedStatement ->
+                type = value.type.toMaterial()
+
+                connection.prepareStatement("INSERT INTO block VALUES(?, ?, ?, ?, ?, ?)").use { preparedStatement ->
                     preparedStatement.setString(1, value.key.asString())
-                    preparedStatement.setString(2, world.key.asString())
-                    preparedStatement.setInt(3, x)
-                    preparedStatement.setInt(4, y)
-                    preparedStatement.setInt(5, z)
+                    preparedStatement.setString(2, JsonObject().toString())
+                    preparedStatement.setString(3, world.key.asString())
+                    preparedStatement.setInt(4, x)
+                    preparedStatement.setInt(5, y)
+                    preparedStatement.setInt(6, z)
 
                     preparedStatement.executeUpdate()
                 }
+            }
+        }
+    }
+
+var Block.persistentDataContainer: JsonObject?
+    get() {
+        if (! isCustomBlock) {
+            return null
+        }
+
+        Vanilife.dataSource.connection.use { connection ->
+            connection.prepareStatement("SELECT pdc FROM block WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
+                preparedStatement.setString(1, world.key.asString())
+                preparedStatement.setInt(2, x)
+                preparedStatement.setInt(3, y)
+                preparedStatement.setInt(4, z)
+
+                preparedStatement.executeQuery().use { resultSet ->
+                    if (! resultSet.next()) {
+                        return null
+                    }
+
+                    return JsonParser.parseString(resultSet.getString("pdc")).asJsonObject
+                }
+            }
+        }
+    }
+    set(value) {
+        Vanilife.dataSource.connection.use { connection ->
+            connection.prepareStatement("UPDATE block SET pdc = ? WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
+                preparedStatement.setString(1, (value ?: JsonObject()).toString())
+                preparedStatement.setInt(2, x)
+                preparedStatement.setInt(3, y)
+                preparedStatement.setInt(4, z)
+                preparedStatement.executeUpdate()
             }
         }
     }
