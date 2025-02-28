@@ -8,14 +8,19 @@ import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
+import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 
 var Player.money: Int
     get() {
-        return inventory.contents
-            .filterNotNull()
+        val contents = (openInventory.topInventory.takeIf { it is CraftingInventory }
+            ?.run { (openInventory.topInventory as CraftingInventory).matrix } ?: emptyArray<ItemStack?>()) + inventory.contents
+        val money = contents.filterNotNull()
             .filter { it.customItemType is BillItemType }
             .sumOf { (it.customItemType as BillItemType).price * it.amount }
+        val moneyOnCursor = itemOnCursor.takeIf { it.customItemType is BillItemType }
+            ?.run { (itemOnCursor.customItemType as BillItemType).price * itemOnCursor.amount } ?: 0
+        return money + moneyOnCursor
     }
     set(value) {
         if (money <= value) {
