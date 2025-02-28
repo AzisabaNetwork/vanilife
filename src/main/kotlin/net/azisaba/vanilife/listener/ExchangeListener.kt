@@ -33,7 +33,6 @@ object ExchangeListener: Listener {
         map.toMap()
     }
 
-    private val ingredientSlots = listOf(1, 2, 3, 4)
     private const val RESULT_SLOT = 0
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -48,7 +47,7 @@ object ExchangeListener: Listener {
 
         val slot = event.slot.takeIf { ingredientSlots.contains(it) || it == RESULT_SLOT } ?: return
 
-        exchange(event.whoClicked, inventory, slot, 0, ingredientSlots)
+        exchange(event.whoClicked, inventory, slot, RESULT_SLOT, ingredientSlots)
     }
 
     private fun exchange(player: HumanEntity, inventory: Inventory, slot: Int, resultSlot: Int, ingredientSlots: List<Int>) {
