@@ -8,9 +8,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import net.azisaba.vanilife.data.Config
-import net.azisaba.vanilife.listener.BlockListener
-import net.azisaba.vanilife.listener.PacketListener
-import net.azisaba.vanilife.listener.PlayerListener
+import net.azisaba.vanilife.listener.*
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.vwm.Cluster
@@ -69,8 +67,8 @@ class Vanilife : JavaPlugin() {
         saveDefaultConfig()
         reloadPluginConfig()
 
-        createTableIfNotExists("block", ":type VARCHAR(64) NOT NULL, pdc JSON, world VARCHAR(32) NOT NULL, x INT NOT NULL, y INT NOT NULL, z INT NOT NULL, CHECK(JSON_VALID(pdc))")
-        createTableIfNotExists("cluster", ":uuid VARCHAR(36) PRIMARY KEY, year SMALLINT UNSIGNED NOT NULL, season VARCHAR(6) NOT NULL, overworld VARCHAR(32) PRIMARY KEY, the_nether VARCHAR(32) PRIMARY KEY, the_end VARCHAR(32) PRIMARY KEY")
+        createTableIfNotExists("block", ":type VARCHAR(64) NOT NULL, data_store JSON, world VARCHAR(32) NOT NULL, x INT NOT NULL, y INT NOT NULL, z INT NOT NULL, CHECK(JSON_VALID(data_store))")
+        createTableIfNotExists("vwm_cluster", ":uuid VARCHAR(36) PRIMARY KEY, year SMALLINT UNSIGNED NOT NULL, season VARCHAR(6) NOT NULL, overworld VARCHAR(32) UNIQUE, the_nether VARCHAR(32) UNIQUE, the_end VARCHAR(32) UNIQUE")
 
         Cluster.init()
         PacketEvents.getAPI().init()
@@ -78,7 +76,9 @@ class Vanilife : JavaPlugin() {
         HudRunnable.runTaskTimerAsynchronously(this, 0L, 1L)
 
         server.pluginManager.registerEvents(BlockListener, this)
+        server.pluginManager.registerEvents(ExchangeListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
+        server.pluginManager.registerEvents(ServerListener, this)
     }
 
     override fun onDisable() {
