@@ -17,7 +17,7 @@ object BlockListener: Listener {
             return
         }
 
-        block.customBlockType!!.item?.let {
+        block.customBlockType!!.itemType?.let {
             event.isDropItems = false
             block.world.dropItem(block.location, ItemStack(it))
         }

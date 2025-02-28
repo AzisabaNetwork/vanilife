@@ -7,6 +7,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.jetbrains.annotations.ApiStatus
 
 abstract class BillItemType(final override val price: Int): CustomItemType, Priced {
     companion object {
@@ -48,11 +49,28 @@ abstract class BillItemType(final override val price: Int): CustomItemType, Pric
 
             return itemStacks
         }
+
+        @ApiStatus.Experimental
+        fun createItemStacks(amount: Int, type: BillItemType): Collection<ItemStack> {
+            val billAmount = amount / type.price
+            val maxStackSize = type.type.maxStackSize
+
+            val itemStacks = mutableListOf<ItemStack>()
+            var remainingAmount = billAmount
+
+            while (remainingAmount > 0) {
+                val currentAmount = if (remainingAmount >= maxStackSize) maxStackSize else remainingAmount
+                itemStacks.add(ItemStack(type, currentAmount))
+                remainingAmount -= currentAmount
+            }
+
+            return itemStacks
+        }
     }
 
     override val key: Key = Key.key(Vanilife.PLUGIN_ID, "${price}bill")
 
-    override val type: ItemType = ItemType.GOLD_INGOT
+    override val type: ItemType = ItemType.STICK
 
     override val title: Component = Component.translatable("item.vanilife.bill", Component.text(price))
 

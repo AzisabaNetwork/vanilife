@@ -5,6 +5,7 @@ import com.google.gson.JsonParser
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.block.CustomBlockType
 import net.azisaba.vanilife.registry.BlockTypes
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
@@ -29,6 +30,13 @@ var Block.customBlockType: CustomBlockType?
         }
     }
     set(value) {
+        if (! Bukkit.isPrimaryThread()) {
+            throw IllegalStateException("Custom block types for blocks are asynchronous and cannot be changed.")
+        }
+
+        customBlockType?.onBreak(this@customBlockType)
+        customBlockMap.remove(this)
+
         Vanilife.dataSource.connection.use { connection ->
             if (value == null) {
                 connection.prepareStatement("DELETE FROM block WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
@@ -51,19 +59,24 @@ var Block.customBlockType: CustomBlockType?
                     preparedStatement.setInt(6, z)
 
                     preparedStatement.executeUpdate()
+
+                    Bukkit.getScheduler().runTask(Vanilife.plugin) { ->
+                        value.onPlace(this)
+                        customBlockMap[this] = value
+                    }
                 }
             }
         }
     }
 
-var Block.persistentDataContainer: JsonObject?
+var Block.dataStore: JsonObject?
     get() {
         if (! isCustomBlock) {
             return null
         }
 
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("SELECT pdc FROM block WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
+            connection.prepareStatement("SELECT data_store FROM block WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
                 preparedStatement.setString(1, world.key.asString())
                 preparedStatement.setInt(2, x)
                 preparedStatement.setInt(3, y)
@@ -74,18 +87,23 @@ var Block.persistentDataContainer: JsonObject?
                         return null
                     }
 
-                    return JsonParser.parseString(resultSet.getString("pdc")).asJsonObject
+                    return JsonParser.parseString(resultSet.getString("data_store")).asJsonObject
                 }
             }
         }
     }
     set(value) {
+        if (! isCustomBlock) {
+            return
+        }
+
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("UPDATE block SET pdc = ? WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
+            connection.prepareStatement("UPDATE block SET data_store = ? WHERE world = ? AND x = ? AND y = ? AND z = ?").use { preparedStatement ->
                 preparedStatement.setString(1, (value ?: JsonObject()).toString())
-                preparedStatement.setInt(2, x)
-                preparedStatement.setInt(3, y)
-                preparedStatement.setInt(4, z)
+                preparedStatement.setString(2, world.key.asString())
+                preparedStatement.setInt(3, x)
+                preparedStatement.setInt(4, y)
+                preparedStatement.setInt(5, z)
                 preparedStatement.executeUpdate()
             }
         }
