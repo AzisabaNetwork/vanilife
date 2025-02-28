@@ -3,12 +3,14 @@ package net.azisaba.vanilife.listener
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.extension.ItemStack
 import net.azisaba.vanilife.extension.customItemType
+import net.azisaba.vanilife.extension.giveItemStack
 import net.azisaba.vanilife.item.BillItemType
 import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType
@@ -48,10 +50,12 @@ object ExchangeListener: Listener {
 
         val slot = event.slot
 
+        println(event.action)
+
         if (ingredientSlots.contains(slot)) {
             updateExchange(inventory, ingredientSlots)
         } else if (slot == RESULT_SLOT) {
-            exchange(event.whoClicked, inventory, ingredientSlots)
+            exchange(event.whoClicked, inventory, event.action, ingredientSlots)
         }
     }
 
@@ -70,13 +74,17 @@ object ExchangeListener: Listener {
         }
     }
 
-    private fun exchange(player: HumanEntity, inventory: Inventory, ingredientSlots: List<Int>, resultSlot: Int = RESULT_SLOT) {
+    private fun exchange(player: HumanEntity, inventory: Inventory, action: InventoryAction, ingredientSlots: List<Int>, resultSlot: Int = RESULT_SLOT) {
         if (! player.itemOnCursor.isEmpty) {
             return
         }
 
         val result = (inventory.getItem(resultSlot).takeIf { it?.customItemType is BillItemType } ?: return).also {
-            player.setItemOnCursor(it)
+            if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                player.giveItemStack(it)
+            } else {
+                player.setItemOnCursor(it)
+            }
         }
         val resultType = result.customItemType!! as BillItemType
         val resultPrice = resultType.price * result.amount

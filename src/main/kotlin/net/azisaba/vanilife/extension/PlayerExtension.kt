@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
+import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
@@ -49,7 +50,7 @@ var Player.money: Int
         }
     }
 
-fun Player.giveItemStack(vararg itemStacks: ItemStack) {
+fun HumanEntity.giveItemStack(vararg itemStacks: ItemStack) {
     val remaining = mutableListOf<ItemStack>()
     itemStacks.forEach { remaining.addAll(inventory.addItem(it).values) }
 
