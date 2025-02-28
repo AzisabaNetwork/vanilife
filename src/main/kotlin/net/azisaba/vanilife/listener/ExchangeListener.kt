@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.Inventory
@@ -35,7 +36,7 @@ object ExchangeListener: Listener {
 
     private const val RESULT_SLOT = 0
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onInventoryClick(event: InventoryClickEvent) {
         val inventory = event.clickedInventory.takeIf { it is CraftingInventory } ?: return
         val inventoryType = inventory.type.takeIf { it == InventoryType.CRAFTING || it == InventoryType.WORKBENCH } ?: return
@@ -45,37 +46,56 @@ object ExchangeListener: Listener {
             else -> throw IllegalStateException()
         }
 
-        val slot = event.slot.takeIf { ingredientSlots.contains(it) || it == RESULT_SLOT } ?: return
+        val slot = event.slot
 
-        exchange(event.whoClicked, inventory, slot, RESULT_SLOT, ingredientSlots)
+        if (ingredientSlots.contains(slot)) {
+            updateExchange(inventory, ingredientSlots)
+        } else if (slot == RESULT_SLOT) {
+            exchange(event.whoClicked, inventory, ingredientSlots)
+        }
     }
 
-    private fun exchange(player: HumanEntity, inventory: Inventory, slot: Int, resultSlot: Int, ingredientSlots: List<Int>) {
-        if (slot == resultSlot) {
-            val result = (inventory.getItem(resultSlot).takeIf { it?.customItemType is BillItemType } ?: return).also {
-                player.setItemOnCursor(it)
-            }
-            val resultType = result.customItemType!! as BillItemType
-            val resultPrice = resultType.price * result.amount
-
-            val ingredientMap = ingredientSlots.filter { inventory.getItem(it) != null }
-                .map { it to inventory.getItem(it)!! }
-                .takeIf { it.isNotEmpty() && it.all {
-                        entry -> entry.second.customItemType is BillItemType && entry.second.isSimilar(it.first().second)
-                } } ?: return
-            val ingredientType = ingredientMap.first().second.customItemType!! as BillItemType
-
-            var remainingAmount = resultPrice / ingredientType.price
-
-            for ((index, ingredient) in ingredientMap) {
-                val remove = if (remainingAmount < ingredient.amount) remainingAmount else ingredient.amount
-                inventory.setItem(index, ingredient.apply { amount -= remove })
-                remainingAmount -= remove
-            }
-
-            return
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onInventoryDrag(event: InventoryDragEvent) {
+        val inventory = event.inventory.takeIf { it is CraftingInventory } ?: return
+        val inventoryType = inventory.type.takeIf { it == InventoryType.CRAFTING || it == InventoryType.WORKBENCH } ?: return
+        val ingredientSlots = when (inventoryType) {
+            InventoryType.CRAFTING -> (1..4).toList()
+            InventoryType.WORKBENCH -> (1..9).toList()
+            else -> throw IllegalStateException()
         }
 
+        if (event.inventorySlots.any { it in ingredientSlots }) {
+            updateExchange(inventory, ingredientSlots)
+        }
+    }
+
+    private fun exchange(player: HumanEntity, inventory: Inventory, ingredientSlots: List<Int>, resultSlot: Int = RESULT_SLOT) {
+        val result = (inventory.getItem(resultSlot).takeIf { it?.customItemType is BillItemType } ?: return).also {
+            player.setItemOnCursor(it)
+        }
+        val resultType = result.customItemType!! as BillItemType
+        val resultPrice = resultType.price * result.amount
+
+        val ingredientMap = ingredientSlots.filter { inventory.getItem(it) != null }
+            .map { it to inventory.getItem(it)!! }
+            .takeIf { it.isNotEmpty() && it.all {
+                    entry -> entry.second.customItemType is BillItemType && entry.second.isSimilar(it.first().second)
+            } } ?: return
+        val ingredientType = ingredientMap.first().second.customItemType!! as BillItemType
+
+        var remainingAmount = resultPrice / ingredientType.price
+
+        for ((index, ingredient) in ingredientMap) {
+            val remove = if (remainingAmount < ingredient.amount) remainingAmount else ingredient.amount
+            inventory.setItem(index, ingredient.apply { amount -= remove })
+            remainingAmount -= remove
+        }
+
+        updateExchange(inventory, ingredientSlots, resultSlot)
+    }
+
+    private fun updateExchange(inventory: Inventory, ingredientSlots: List<Int>, resultSlot: Int = RESULT_SLOT) {
         Bukkit.getScheduler().runTaskLater(Vanilife.plugin, { ->
             val ingredients = ingredientSlots.mapNotNull { inventory.getItem(it) }
 
