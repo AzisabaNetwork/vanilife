@@ -32,7 +32,7 @@ interface Cluster: Iterable<World> {
 
         fun init() {
             Vanilife.dataSource.connection.use { connection ->
-                connection.prepareStatement("SELECT * FROM cluster").use { preparedStatement ->
+                connection.prepareStatement("SELECT * FROM vwm_cluster").use { preparedStatement ->
                     preparedStatement.executeQuery().use { resultSet ->
                         while (resultSet.next()) {
                             create(resultSet.getString("uuid").toUuid(),
@@ -53,7 +53,7 @@ interface Cluster: Iterable<World> {
                 instances.add(it)
 
                 Vanilife.dataSource.connection.use { connection ->
-                    connection.prepareStatement("INSERT INTO cluster VALUES(?, ?, ?, ?, ?, ?)").use { preparedStatement ->
+                    connection.prepareStatement("INSERT INTO vwm_cluster VALUES(?, ?, ?, ?, ?, ?)").use { preparedStatement ->
                         preparedStatement.setString(1, it.uuid.toString())
                         preparedStatement.setInt(2, year.value)
                         preparedStatement.setString(3, season.name.lowercase())

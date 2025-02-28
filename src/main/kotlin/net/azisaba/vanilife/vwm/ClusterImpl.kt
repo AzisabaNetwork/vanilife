@@ -32,7 +32,7 @@ internal class ClusterImpl(
         File(name).deleteRecursively()
 
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("DELETE FROM cluster WHERE uuid = ?").use { preparedStatement ->
+            connection.prepareStatement("DELETE FROM vwm_cluster WHERE uuid = ?").use { preparedStatement ->
                 preparedStatement.setString(1, uuid.toString())
                 preparedStatement.executeUpdate()
             }
