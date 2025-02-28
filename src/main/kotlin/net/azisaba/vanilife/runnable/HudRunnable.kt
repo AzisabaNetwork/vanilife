@@ -2,6 +2,7 @@ package net.azisaba.vanilife.runnable
 
 import net.azisaba.vanilife.extension.money
 import net.azisaba.vanilife.extension.sendMoneyHud
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
@@ -12,7 +13,12 @@ object HudRunnable: BukkitRunnable() {
     private const val ANIMATION_TICKS = 12
 
     override fun run() {
-        for (player in Bukkit.getOnlinePlayers().filter { ! it.gameMode.isInvulnerable }) {
+        for (player in Bukkit.getOnlinePlayers()) {
+            if (player.gameMode.isInvulnerable) {
+                player.sendActionBar(Component.empty())
+                continue
+            }
+
             val uuid = player.uniqueId
 
             val money = player.money

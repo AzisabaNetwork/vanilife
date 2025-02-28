@@ -71,6 +71,10 @@ object ExchangeListener: Listener {
     }
 
     private fun exchange(player: HumanEntity, inventory: Inventory, ingredientSlots: List<Int>, resultSlot: Int = RESULT_SLOT) {
+        if (! player.itemOnCursor.isEmpty) {
+            return
+        }
+
         val result = (inventory.getItem(resultSlot).takeIf { it?.customItemType is BillItemType } ?: return).also {
             player.setItemOnCursor(it)
         }
