@@ -50,8 +50,6 @@ object ExchangeListener: Listener {
 
         val slot = event.slot
 
-        println(event.action)
-
         if (ingredientSlots.contains(slot)) {
             updateExchange(inventory, ingredientSlots)
         } else if (slot == RESULT_SLOT) {
