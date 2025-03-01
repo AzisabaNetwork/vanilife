@@ -3,6 +3,7 @@ package net.azisaba.vanilife.item
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemType
 
 interface CustomItemType: Keyed {
@@ -17,5 +18,8 @@ interface CustomItemType: Keyed {
         get() = false
 
     val model: Key?
+        get() = null
+
+    val recipe: CraftingRecipe?
         get() = null
 }

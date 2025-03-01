@@ -79,6 +79,7 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(ExchangeListener, this)
         server.pluginManager.registerEvents(InventoryListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
+        server.pluginManager.registerEvents(PortalListener, this)
         server.pluginManager.registerEvents(ServerListener, this)
     }
 
