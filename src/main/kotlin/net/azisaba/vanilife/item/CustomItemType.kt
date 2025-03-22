@@ -4,7 +4,8 @@ import net.azisaba.vanilife.extension.ItemStack
 import net.azisaba.vanilife.loot.modifier.LootModifier
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
@@ -16,9 +17,9 @@ interface CustomItemType: Keyed {
     val itemModel: Key?
         get() = null
 
-    val displayName: ComponentLike
+    val displayName: Component
 
-    val lore: Collection<ComponentLike>
+    val lore: List<Component>
         get() = emptyList()
 
     val rarity: ItemRarity
@@ -35,6 +36,18 @@ interface CustomItemType: Keyed {
 
     val lootModifiers: List<LootModifier>?
         get() = null
+
+    fun onInHand(player: Player) {
+    }
+
+    fun onInMainHand(player: Player) {
+    }
+
+    fun onInOffHand(player: Player) {
+    }
+
+    fun use(player: Player) {
+    }
 
     fun createItemStack(amount: Int = 1): ItemStack {
         return ItemStack(this, amount)

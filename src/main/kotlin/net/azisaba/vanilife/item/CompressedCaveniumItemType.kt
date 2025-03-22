@@ -5,7 +5,6 @@ import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
@@ -21,7 +20,7 @@ object CompressedCaveniumItemType: CustomItemType {
     override val itemModel: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "cavenium")
 
-    override val displayName: ComponentLike
+    override val displayName: Component
         get() = Component.translatable("item.vanilife.compressed_cavenium")
 
     override val rarity: ItemRarity

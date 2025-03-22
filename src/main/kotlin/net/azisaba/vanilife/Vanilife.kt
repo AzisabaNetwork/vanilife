@@ -6,7 +6,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.listener.*
-import net.azisaba.vanilife.registry.Recipes
+import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.util.runTaskTimerAsync
@@ -64,16 +64,17 @@ class Vanilife : JavaPlugin() {
 
         createTableIfNotExists(DATABASE_PLAY_BOOST, ":player VARCHAR(36) NOT NULL, boost_key VARCHAR(64) NOT NULL, boost_value INT UNSIGNED NOT NULL, PRIMARY KEY (player, boost_key)")
 
-        server.pluginManager.registerEvents(BlockListener, this)
         server.pluginManager.registerEvents(CaveniumListener, this)
+        server.pluginManager.registerEvents(CustomEnchantmentListener, this)
+        server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
         server.pluginManager.registerEvents(InventoryListener, this)
+        server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
-        server.pluginManager.registerEvents(WorldListener, this)
 
         runTaskTimerAsync(0, 1, HudRunnable)
 
-        for (recipe in Recipes) {
+        for (recipe in CustomRecipes) {
             Bukkit.addRecipe(recipe)
         }
     }

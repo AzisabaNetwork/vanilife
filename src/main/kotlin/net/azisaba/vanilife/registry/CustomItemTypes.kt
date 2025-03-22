@@ -7,6 +7,8 @@ object CustomItemTypes: KeyedRegistry<CustomItemType>() {
     val BULK_MINING_BOOK = register(BulkMiningBookItemType)
     val CAVENIUM = register(CaveniumItemType)
     val COMPRESSED_CAVENIUM = register(CompressedCaveniumItemType)
+    val MAGNITE = register(MagniteItemType)
+    val MAGNITE_MINING_BOOK = register(MagniteMiningBookItemType)
     val MONEY_1000 = register(MoneyItemType.MONEY_1000)
     val MONEY_5000 = register(MoneyItemType.MONEY_5000)
     val MONEY_10000 = register(MoneyItemType.MONEY_10000)
@@ -15,7 +17,7 @@ object CustomItemTypes: KeyedRegistry<CustomItemType>() {
     override fun <T : CustomItemType> register(value: T): T {
         value.craftingRecipes?.let {
             for (recipe in it) {
-                Recipes.register(recipe)
+                CustomRecipes.register(recipe)
             }
         }
 

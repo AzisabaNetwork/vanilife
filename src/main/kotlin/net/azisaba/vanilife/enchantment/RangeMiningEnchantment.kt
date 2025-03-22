@@ -4,9 +4,10 @@ import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.registry.tag.TagKey
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.registry.CustomEnchantments
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -19,7 +20,7 @@ object RangeMiningEnchantment: ToolEnchantment {
     override val key: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "range_mining")
 
-    override val displayName: ComponentLike
+    override val displayName: Component
         get() = Component.translatable("enchantment.vanilife.range_mining")
 
     override val maximumLevel: Int
@@ -37,10 +38,19 @@ object RangeMiningEnchantment: ToolEnchantment {
     override val supportedItems: TagKey<ItemType>
         get() = ItemTypeTagKeys.PICKAXES
 
-    override fun use(player: Player, block: Block, itemStack: ItemStack, enchantment: Enchantment) {
+    override val exclusives: Set<Keyed>
+        get() = setOf(CustomEnchantments.BULK_MINING)
+
+    override fun use(player: Player, blocks: MutableSet<Block>, itemStack: ItemStack, enchantment: Enchantment) {
+        if (blocks.size != 1) {
+            return
+        }
+
+        val block = blocks.first()
+
         val range = when (itemStack.getEnchantmentLevel(enchantment)) {
             1 -> {
-                block.getRelative(BlockFace.DOWN).breakNaturally(itemStack)
+                blocks.add(block.getRelative(BlockFace.DOWN))
                 return
             }
             else -> itemStack.getEnchantmentLevel(enchantment)
@@ -59,7 +69,7 @@ object RangeMiningEnchantment: ToolEnchantment {
         for (x in pos1.blockX..pos2.blockX) {
             for (y in pos1.blockY..pos2.blockY) {
                 for (z in pos1.blockZ..pos2.blockZ) {
-                    block.world.getBlockAt(x, y, z).breakNaturally(itemStack)
+                    blocks.add(block.world.getBlockAt(x, y, z))
                 }
             }
         }

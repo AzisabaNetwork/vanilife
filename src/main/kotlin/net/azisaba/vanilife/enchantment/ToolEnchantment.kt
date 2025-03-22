@@ -9,5 +9,8 @@ interface ToolEnchantment: CustomEnchantment {
     override val activeSlots: Set<EquipmentSlotGroup>
         get() = setOf(EquipmentSlotGroup.HAND)
 
-    fun use(player: Player, block: Block, itemStack: ItemStack, enchantment: org.bukkit.enchantments.Enchantment)
+    val usePriority: Int
+        get() = -1
+
+    fun use(player: Player, blocks: MutableSet<Block>, itemStack: ItemStack, enchantment: org.bukkit.enchantments.Enchantment)
 }

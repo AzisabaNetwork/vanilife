@@ -1,7 +1,6 @@
 package net.azisaba.vanilife.listener
 
 import net.azisaba.vanilife.extension.customItemType
-import net.azisaba.vanilife.extension.isNotEmpty
 import net.azisaba.vanilife.extension.matrixSlots
 import net.azisaba.vanilife.extension.resultSlot
 import net.azisaba.vanilife.item.MoneyItemType
@@ -14,7 +13,7 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.CraftingInventory
-import java.util.UUID
+import java.util.*
 
 object ExchangeListener: Listener {
     private val updating = mutableSetOf<UUID>()
@@ -48,7 +47,7 @@ object ExchangeListener: Listener {
             return
         }
 
-        if (player.itemOnCursor.isNotEmpty) {
+        if (!player.itemOnCursor.isEmpty) {
             return
         }
 

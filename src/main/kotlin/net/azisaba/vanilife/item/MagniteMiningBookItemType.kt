@@ -9,18 +9,18 @@ import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 import org.bukkit.loot.LootTables
 
-object BulkMiningBookItemType: CustomItemType {
+object MagniteMiningBookItemType: CustomItemType {
     override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining_book")
+        get() = Key.key(Vanilife.PLUGIN_ID, "magnite_mining_book")
 
     override val itemType: ItemType
         get() = ItemType.BOOK
 
     override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining_book")
+        get() = Key.key(Vanilife.PLUGIN_ID, "magnite_mining_book")
 
     override val displayName: Component
-        get() = Component.translatable("item.vanilife.bulk_mining_book")
+        get() = Component.translatable("item.vanilife.magnite_mining_book")
 
     override val rarity: ItemRarity
         get() = ItemRarity.UNCOMMON
@@ -29,7 +29,5 @@ object BulkMiningBookItemType: CustomItemType {
         get() = 1
 
     override val lootModifiers: List<LootModifier>
-        get() {
-            return listOf(LootModifier.randomized(RandomizedLootModifier.Type.MODIFY, LootTables.ABANDONED_MINESHAFT, createItemStack(), 0.025))
-        }
+        get() = listOf(LootModifier.randomized(RandomizedLootModifier.Type.MODIFY, LootTables.BASTION_TREASURE, createItemStack(), 0.025))
 }

@@ -5,31 +5,34 @@ import net.azisaba.vanilife.loot.modifier.LootModifier
 import net.azisaba.vanilife.loot.modifier.RandomizedLootModifier
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 import org.bukkit.loot.LootTables
 
-object BulkMiningBookItemType: CustomItemType {
+object MagniteItemType: CustomItemType {
     override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining_book")
+        get() = Key.key(Vanilife.PLUGIN_ID, "magnite")
 
     override val itemType: ItemType
-        get() = ItemType.BOOK
+        get() = ItemType.STICK
 
     override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining_book")
+        get() = Key.key(Vanilife.PLUGIN_ID, "magnite")
 
     override val displayName: Component
-        get() = Component.translatable("item.vanilife.bulk_mining_book")
+        get() = Component.translatable("item.vanilife.magnite")
 
     override val rarity: ItemRarity
         get() = ItemRarity.UNCOMMON
 
-    override val maxStackSize: Int
-        get() = 1
-
     override val lootModifiers: List<LootModifier>
-        get() {
-            return listOf(LootModifier.randomized(RandomizedLootModifier.Type.MODIFY, LootTables.ABANDONED_MINESHAFT, createItemStack(), 0.025))
+        get() = listOf(LootModifier.randomized(RandomizedLootModifier.Type.ADD, LootTables.WITHER_SKELETON, createItemStack(), 0.005))
+
+    override fun onInHand(player: Player) {
+        if (player.gameMode.isInvulnerable) {
+            return
         }
+        player.fireTicks += 22
+    }
 }

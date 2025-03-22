@@ -3,12 +3,12 @@ package net.azisaba.vanilife.enchantment
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.tag.TagKey
 import net.azisaba.vanilife.registry.Keyed
-import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemType
 
 interface CustomEnchantment: Keyed {
-    val displayName: ComponentLike
+    val displayName: Component
 
     val weight: Int
         get() = 1

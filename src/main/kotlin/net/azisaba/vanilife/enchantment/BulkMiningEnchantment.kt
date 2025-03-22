@@ -5,11 +5,11 @@ import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.registry.tag.TagKey
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.extension.toMaterial
+import net.azisaba.vanilife.registry.CustomEnchantments
 import net.azisaba.vanilife.registry.CustomTags
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -22,7 +22,7 @@ object BulkMiningEnchantment: ToolEnchantment {
     override val key: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining")
 
-    override val displayName: ComponentLike
+    override val displayName: Component
         get() = Component.translatable("enchantment.vanilife.bulk_mining")
 
     override val maximumLevel: Int
@@ -41,15 +41,21 @@ object BulkMiningEnchantment: ToolEnchantment {
         get() = ItemTypeTagKeys.PICKAXES
 
     override val exclusives: Set<Keyed>
-        get() = setOf(RangeMiningEnchantment)
+        get() = setOf(CustomEnchantments.RANGE_MINING)
 
-    override fun use(player: Player, block: Block, itemStack: ItemStack, enchantment: Enchantment) {
+    override fun use(player: Player, blocks: MutableSet<Block>, itemStack: ItemStack, enchantment: Enchantment) {
+        if (blocks.size != 1) {
+            return
+        }
+
+        val block = blocks.first()
+
         if (!CustomTags.ORE.map { it.toMaterial() }.contains(block.type)) {
             return
         }
 
         fun mine(block: Block, source: Block, type: Material = source.type) {
-            block.breakNaturally(itemStack)
+            blocks.add(block)
 
             for (face in BlockFace.entries) {
                 val relativeBlock = block.getRelative(face)

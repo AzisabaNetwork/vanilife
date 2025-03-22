@@ -5,7 +5,6 @@ import net.azisaba.vanilife.loot.modifier.LootModifier
 import net.azisaba.vanilife.loot.modifier.RandomizedLootModifier
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 import org.bukkit.loot.LootTables
@@ -20,11 +19,14 @@ object RangeMiningBookItemType: CustomItemType {
     override val itemModel: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "range_mining_book")
 
-    override val displayName: ComponentLike
+    override val displayName: Component
         get() = Component.translatable("item.vanilife.range_mining_book")
 
     override val rarity: ItemRarity
         get() = ItemRarity.UNCOMMON
+
+    override val maxStackSize: Int
+        get() = 1
 
     override val lootModifiers: List<LootModifier>
         get() {

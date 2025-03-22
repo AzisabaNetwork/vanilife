@@ -4,11 +4,13 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.item.CustomItemType
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
+import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
 
 private val KEY_CUSTOM_ITEM_TYPE = Key.key(Vanilife.PLUGIN_ID, "custom_item_type")
@@ -65,5 +67,10 @@ fun ItemStack.getEnchantmentLevel(enchantment: Enchantment): Int {
     return enchantments.entries.firstOrNull { it.key.key == enchantment.key }?.value ?: -1
 }
 
-val ItemStack.isNotEmpty: Boolean
-    get() = !isEmpty
+fun ItemType.toMaterial(): Material {
+    return Material.matchMaterial(key.asString())!!
+}
+
+fun Material.toItemType(): ItemType {
+    return Registry.ITEM.get(key)!!
+}

@@ -8,7 +8,7 @@ import net.azisaba.vanilife.item.CompressedCaveniumItemType
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.registry.CustomTags
 import net.azisaba.vanilife.registry.PlayBoosts
-import net.azisaba.vanilife.registry.Recipes
+import net.azisaba.vanilife.registry.CustomRecipes
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -31,8 +31,8 @@ object CaveniumListener: Listener {
 
         if (Random.nextDouble() < probability) {
             player.discoverRecipes(CompressedCaveniumItemType.craftingRecipes.map { it.key })
-            player.discoverRecipe(Recipes.BULK_MINING_LV1_ENCHANTED_BOOK.key)
-            player.discoverRecipe(Recipes.RANGE_MINING_LV1_ENCHANTED_BOOK.key)
+            player.discoverRecipe(CustomRecipes.BULK_MINING_LV1_ENCHANTED_BOOK.key)
+            player.discoverRecipe(CustomRecipes.RANGE_MINING_LV1_ENCHANTED_BOOK.key)
 
             if (playBoost > 0) {
                 player.setPlayBoost(PlayBoosts.CAVENIUM, playBoost - 1)
@@ -46,8 +46,8 @@ object CaveniumListener: Listener {
     fun onCraftCompressedCavenium(event: CraftItemEvent) {
         if (event.inventory.result?.customItemType == CustomItemTypes.COMPRESSED_CAVENIUM) {
             val player = event.whoClicked
-            player.discoverRecipe(Recipes.BULK_MINING_LV2_ENCHANTED_BOOK.key)
-            player.discoverRecipe(Recipes.RANGE_MINING_LV2_ENCHANTED_BOOK.key)
+            player.discoverRecipe(CustomRecipes.BULK_MINING_LV2_ENCHANTED_BOOK.key)
+            player.discoverRecipe(CustomRecipes.RANGE_MINING_LV2_ENCHANTED_BOOK.key)
         }
     }
 }
