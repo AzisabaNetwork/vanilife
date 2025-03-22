@@ -10,7 +10,11 @@ object HudFont: Font, Registry<String, Char>() {
 
     val money = register(":money:", '\uE001')
 
-    val space6 = register(":space6:", '\uE002')
+    val moneyWobble1 = register(":money_wobble1:", '\uE002')
 
-    val space88 = register(":space88:", '\uE003')
+    val moneyWobble2 = register(":money_wobble2:", '\uE003')
+
+    val space6 = register(":space6:", '\uE004')
+
+    val space88 = register(":space88:", '\uE005')
 }

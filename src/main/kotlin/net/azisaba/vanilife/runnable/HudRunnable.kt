@@ -2,15 +2,18 @@ package net.azisaba.vanilife.runnable
 
 import net.azisaba.vanilife.extension.money
 import net.azisaba.vanilife.extension.sendMoneyHud
+import net.azisaba.vanilife.font.HudFont
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
-import java.util.UUID
+import java.util.*
 
 object HudRunnable: Runnable {
     private val animationStateMap = mutableMapOf<UUID, AnimationState>()
 
-    private const val ANIMATION_TICKS = 12
+    private const val ANIMATION_TICKS = 8
+    private const val DISPLAY_TICKS = 6
+    private const val WOBBLE_ANIMATION_TICKS = 5
 
     override fun run() {
         for (player in Bukkit.getOnlinePlayers()) {
@@ -23,42 +26,56 @@ object HudRunnable: Runnable {
             val money = player.money
             val state = animationStateMap[uuid]
 
-            if (state == null || state.targetMoney != money) {
-                val startMoney = state?.displayedMoney ?: money
+            if (state == null || state.money != money) {
                 animationStateMap[uuid] = AnimationState(
-                    displayedMoney = startMoney,
-                    targetMoney = money,
-                    remainingTicks = ANIMATION_TICKS
+                    money = money,
+                    targetDifference = money - (state?.money ?: money)
                 )
             }
 
             val currentState = animationStateMap[uuid]!!
 
-            val displayedMoney = currentState.displayedMoney
-            val targetMoney = currentState.targetMoney
+            val targetDifference = currentState.targetDifference
+            val displayedDifference = currentState.displayedDifference
             val remainingTicks = currentState.remainingTicks
+            val wobbleAnimationTicks = currentState.wobbleAnimationTicks
 
             if (remainingTicks > 0) {
-                val difference = targetMoney - displayedMoney
-                val step = difference / remainingTicks
+                val difference = targetDifference - displayedDifference
+                val step = difference / remainingTicks - DISPLAY_TICKS
 
-                currentState.displayedMoney += step
                 currentState.remainingTicks--
 
-                if (currentState.remainingTicks == 0) {
-                    currentState.displayedMoney = targetMoney
+                if (remainingTicks > DISPLAY_TICKS) {
+                    currentState.displayedDifference += step
+
+                    if (currentState.wobbleAnimationTicks > 0) {
+                        currentState.wobbleAnimationTicks--
+                    } else {
+                        currentState.wobbleAnimationTicks = WOBBLE_ANIMATION_TICKS
+                    }
+                } else {
+                    currentState.displayedDifference = targetDifference
                 }
 
-                player.sendMoneyHud(currentState.displayedMoney, if (displayedMoney < targetMoney) NamedTextColor.GREEN else NamedTextColor.RED)
+                player.sendMoneyHud(String.format("%+d", currentState.displayedDifference), if (targetDifference >= 0) TextColor.color(0, 176, 107) else TextColor.color(255, 75, 0),
+                    when (wobbleAnimationTicks) {
+                        2 -> HudFont.moneyWobble1
+                        0 -> HudFont.moneyWobble2
+                        else -> HudFont.money
+                    }
+                )
             } else {
-                player.sendMoneyHud(money)
+                player.sendMoneyHud(money.toString())
             }
         }
     }
 
     private data class AnimationState(
-        var displayedMoney: Int,
-        val targetMoney: Int,
-        var remainingTicks: Int
+        val money: Int,
+        val targetDifference: Int,
+        var displayedDifference: Int = 0,
+        var remainingTicks: Int = ANIMATION_TICKS + DISPLAY_TICKS,
+        var wobbleAnimationTicks: Int = WOBBLE_ANIMATION_TICKS
     )
 }

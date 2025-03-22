@@ -107,12 +107,12 @@ fun Player.hasPlayBoost(playBoost: PlayBoost): Boolean {
     }
 }
 
-fun Player.sendMoneyHud(money: Int, textColor: TextColor = NamedTextColor.WHITE) {
+fun Player.sendMoneyHud(money: String, textColor: TextColor = NamedTextColor.WHITE, icon: Char = HudFont.money) {
     if (remainingAir < maximumAir) {
         sendActionBar(Component.empty())
         return
     }
 
-    sendActionBar(Component.text("${HudFont.space88}${HudFont.money}").font(HudFont)
-        .append(Component.text(money.toString().padEnd(10, HudFont.space6)).color(textColor)))
+    sendActionBar(Component.text("${HudFont.space88}$icon").font(HudFont)
+        .append(Component.text(money.padEnd(10, HudFont.space6)).color(textColor)))
 }
