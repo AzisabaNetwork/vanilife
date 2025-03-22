@@ -1,5 +1,6 @@
 package net.azisaba.vanilife
 
+import net.azisaba.vanilife.listener.BlockListener
 import net.azisaba.vanilife.listener.ExchangeListener
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.runTaskTimerAsync
@@ -22,6 +23,7 @@ class Vanilife : JavaPlugin() {
     override fun onEnable() {
         _plugin = this
 
+        server.pluginManager.registerEvents(BlockListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
 
         runTaskTimerAsync(0, 1, HudRunnable)
