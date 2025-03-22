@@ -1,5 +1,8 @@
 package net.azisaba.vanilife
 
+import net.azisaba.vanilife.listener.ExchangeListener
+import net.azisaba.vanilife.runnable.HudRunnable
+import net.azisaba.vanilife.util.runTaskTimerAsync
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -18,6 +21,10 @@ class Vanilife : JavaPlugin() {
 
     override fun onEnable() {
         _plugin = this
+
+        server.pluginManager.registerEvents(ExchangeListener, this)
+
+        runTaskTimerAsync(0, 1, HudRunnable)
     }
 
     override fun onDisable() {
