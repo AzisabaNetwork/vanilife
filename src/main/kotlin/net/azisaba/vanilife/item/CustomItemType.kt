@@ -1,6 +1,7 @@
 package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.extension.ItemStack
+import net.azisaba.vanilife.loot.modifier.LootModifier
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.ComponentLike
@@ -30,6 +31,9 @@ interface CustomItemType: Keyed {
         get() = false
 
     val craftingRecipes: List<CraftingRecipe>?
+        get() = null
+
+    val lootModifiers: List<LootModifier>?
         get() = null
 
     fun createItemStack(amount: Int = 1): ItemStack {

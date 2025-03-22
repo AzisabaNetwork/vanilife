@@ -5,17 +5,21 @@ import com.charleskorn.kaml.decodeFromStream
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.data.Config
-import net.azisaba.vanilife.listener.BlockListener
-import net.azisaba.vanilife.listener.ExchangeListener
+import net.azisaba.vanilife.listener.*
+import net.azisaba.vanilife.registry.Recipes
 import net.azisaba.vanilife.runnable.HudRunnable
+import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.util.runTaskTimerAsync
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
 class Vanilife : JavaPlugin() {
     companion object {
         const val PLUGIN_ID = "vanilife"
+
+        const val DATABASE_PLAY_BOOST = "play_boost"
 
         lateinit var plugin: Vanilife
 
@@ -58,10 +62,20 @@ class Vanilife : JavaPlugin() {
         saveDefaultConfig()
         reloadPluginConfig()
 
+        createTableIfNotExists(DATABASE_PLAY_BOOST, ":player VARCHAR(36) NOT NULL, boost_key VARCHAR(64) NOT NULL, boost_value INT UNSIGNED NOT NULL, PRIMARY KEY (player, boost_key)")
+
         server.pluginManager.registerEvents(BlockListener, this)
+        server.pluginManager.registerEvents(CaveniumListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
+        server.pluginManager.registerEvents(InventoryListener, this)
+        server.pluginManager.registerEvents(PlayerListener, this)
+        server.pluginManager.registerEvents(WorldListener, this)
 
         runTaskTimerAsync(0, 1, HudRunnable)
+
+        for (recipe in Recipes) {
+            Bukkit.addRecipe(recipe)
+        }
     }
 
     override fun onDisable() {
