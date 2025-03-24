@@ -60,6 +60,14 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         addIngredient(CustomItemTypes.WHEAT_FLOUR.createItemStack())
     })
 
+    val FRUIT_SANDWICH = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "sandwich").toNamespacedKey(), CustomItemTypes.SANDWICH.createItemStack()).apply {
+        shape("WWW", "SGB", "WWW")
+        setIngredient('W', CustomItemTypes.WHITE_BREAD.createItemStack())
+        setIngredient('S', CustomItemTypes.STRAWBERRY.createItemStack())
+        setIngredient('G', CustomItemTypes.GRAPE.createItemStack())
+        setIngredient('B', CustomItemTypes.BANANA.createItemStack())
+    })
+
     val KNIFE = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "knife").toNamespacedKey(), CustomItemTypes.KNIFE.createItemStack()).apply {
         shape("I", "S")
         setIngredient('I', ItemType.IRON_INGOT.createItemStack())
