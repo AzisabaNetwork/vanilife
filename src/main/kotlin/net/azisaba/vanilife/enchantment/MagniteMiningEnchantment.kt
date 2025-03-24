@@ -58,7 +58,7 @@ object MagniteMiningEnchantment: ToolEnchantment {
             if (MODIFY_MAP.containsKey(blockType)) {
                 blocks.remove(block)
                 block.type = Material.AIR
-                block.world.dropItem(block.location, MODIFY_MAP[blockType]!!.createItemStack())
+                block.world.dropItemNaturally(block.location, MODIFY_MAP[blockType]!!.createItemStack())
                 modified++
             }
         }

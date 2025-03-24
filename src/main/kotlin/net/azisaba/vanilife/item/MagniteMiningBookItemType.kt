@@ -8,13 +8,14 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 import org.bukkit.loot.LootTables
+import org.jetbrains.annotations.Range
 
 object MagniteMiningBookItemType: CustomItemType {
     override val key: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "magnite_mining_book")
 
     override val itemType: ItemType
-        get() = ItemType.BOOK
+        get() = ItemType.STICK
 
     override val itemModel: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "magnite_mining_book")
@@ -25,7 +26,7 @@ object MagniteMiningBookItemType: CustomItemType {
     override val rarity: ItemRarity
         get() = ItemRarity.UNCOMMON
 
-    override val maxStackSize: Int
+    override val maxStackSize: @Range(from = 1, to = 99) Int
         get() = 1
 
     override val lootModifiers: List<LootModifier>

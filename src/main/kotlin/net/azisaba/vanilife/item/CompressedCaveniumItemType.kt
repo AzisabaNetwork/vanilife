@@ -1,14 +1,10 @@
 package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.extension.toNamespacedKey
-import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
-import org.bukkit.inventory.ShapelessRecipe
 
 object CompressedCaveniumItemType: CustomItemType {
     override val key: Key
@@ -28,11 +24,4 @@ object CompressedCaveniumItemType: CustomItemType {
 
     override val enchantmentAura: Boolean
         get() = true
-
-    override val craftingRecipes: List<CraftingRecipe>
-        get() {
-            return listOf(ShapelessRecipe(key.toNamespacedKey(), createItemStack()).apply {
-                addIngredient(9, CustomItemTypes.CAVENIUM.createItemStack())
-            })
-        }
 }

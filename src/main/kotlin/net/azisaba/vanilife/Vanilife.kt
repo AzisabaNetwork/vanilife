@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.listener.*
+import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
@@ -68,9 +69,9 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
-        server.pluginManager.registerEvents(InventoryListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(PlayerListener, this)
+        server.pluginManager.registerEvents(RecipeListener, this)
 
         runTaskTimerAsync(0, 1, HudRunnable)
 

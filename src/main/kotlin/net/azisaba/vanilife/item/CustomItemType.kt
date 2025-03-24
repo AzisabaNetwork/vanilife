@@ -6,10 +6,10 @@ import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
-import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.jetbrains.annotations.Range
 
 interface CustomItemType: Keyed {
     val itemType: ItemType
@@ -25,14 +25,11 @@ interface CustomItemType: Keyed {
     val rarity: ItemRarity
         get() = ItemRarity.COMMON
 
-    val maxStackSize: Int
+    val maxStackSize: @Range(from = 1, to = 99) Int
         get() = itemType.maxStackSize
 
     val enchantmentAura: Boolean
         get() = false
-
-    val craftingRecipes: List<CraftingRecipe>?
-        get() = null
 
     val lootModifiers: List<LootModifier>?
         get() = null

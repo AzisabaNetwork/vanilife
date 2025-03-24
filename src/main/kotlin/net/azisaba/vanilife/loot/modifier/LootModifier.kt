@@ -16,7 +16,7 @@ interface LootModifier {
         }
 
         fun randomized(type: RandomizedLootModifier.Type, target: Keyed, itemStack: ItemStack, probability: Double, amount: Range = Range.of(1), rolls: Range = Range.of(1)): RandomizedLootModifier {
-            return RandomizedLootModifierImpl(type, target, itemStack, probability, amount ,rolls)
+            return RandomizedLootModifierImpl(type, target, itemStack, probability, amount, rolls)
         }
     }
 

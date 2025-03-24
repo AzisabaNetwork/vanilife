@@ -1,7 +1,11 @@
 package net.azisaba.vanilife.extension
 
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.Consumable
+import io.papermc.paper.datacomponent.item.FoodProperties
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.item.CustomItemType
+import net.azisaba.vanilife.item.Food
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -12,6 +16,7 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
+
 
 private val KEY_CUSTOM_ITEM_TYPE = Key.key(Vanilife.PLUGIN_ID, "custom_item_type")
 
@@ -42,15 +47,50 @@ fun ItemStack(customItemType: CustomItemType, amount: Int = 1): ItemStack {
         itemMeta.itemModel = it.toNamespacedKey()
     }
 
-    if (customItemType.enchantmentAura) {
-        itemMeta.addEnchant(Enchantment.INFINITY, 1, false)
-    }
-
     if (customItemType.maxStackSize != customItemType.itemType.maxStackSize) {
         itemMeta.setMaxStackSize(customItemType.maxStackSize)
     }
 
-    return itemStack.apply { this.itemMeta = itemMeta }
+    if (customItemType.enchantmentAura) {
+        itemMeta.addEnchant(Enchantment.INFINITY, 1, false)
+    }
+
+    itemStack.setItemMeta(itemMeta)
+
+    if (customItemType is net.azisaba.vanilife.item.Consumable) {
+        itemStack.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable().apply {
+            customItemType.consumeSeconds?.let {
+                consumeSeconds(it)
+            }
+            customItemType.consumeAnimation?.let {
+                animation(it)
+            }
+            customItemType.consumeSound?.let {
+                sound(it)
+            }
+            customItemType.consumeEffects?.let {
+                addEffects(it)
+            }
+            customItemType.hasConsumeParticles?.let {
+                hasConsumeParticles(it)
+            }
+        })
+    }
+
+    if (customItemType is Food) {
+        itemStack.setData(DataComponentTypes.FOOD, FoodProperties.food().apply {
+            customItemType.foodNutrition?.let {
+                nutrition(it)
+            }
+            customItemType.foodSaturation?.let {
+                saturation(it)
+            }
+            customItemType.foodCanAlwaysEat?.let {
+                canAlwaysEat(it)
+            }
+        })
+    }
+    return itemStack
 }
 
 val ItemStack.customItemType: CustomItemType?

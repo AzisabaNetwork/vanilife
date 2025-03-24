@@ -5,6 +5,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
+import org.jetbrains.annotations.Range
 
 class MoneyItemType private constructor(override val price: Int): CustomItemType, Priced {
     companion object {
@@ -72,4 +73,7 @@ class MoneyItemType private constructor(override val price: Int): CustomItemType
 
     override val displayName: Component
         get() = Component.translatable("item.vanilife.money", Component.text(price))
+
+    override val maxStackSize: @Range(from = 1, to = 99) Int
+        get() = 99
 }
