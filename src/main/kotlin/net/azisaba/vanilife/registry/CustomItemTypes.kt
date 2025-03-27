@@ -11,6 +11,7 @@ object CustomItemTypes: KeyedRegistry<CustomItemType>() {
     val BULK_MINING_BOOK = register(BulkMiningBookItemType)
     val BUTTER = register(ButterItemType)
     val BUTTERED_POTATO = register(ButteredPotatoItemType)
+    val CAVE_STORY = register(CaveStoryItemType)
     val CAVENIUM = register(CaveniumItemType)
     val CHEESE = register(CheeseItemType)
     val CHERRY = register(CherryItemType)

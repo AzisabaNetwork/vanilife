@@ -1,19 +1,24 @@
 package net.azisaba.vanilife.runnable
 
 import net.azisaba.vanilife.extension.money
-import net.azisaba.vanilife.extension.sendMoneyHud
+import net.azisaba.vanilife.extension.scoreLevel
+import net.azisaba.vanilife.extension.sendHud
 import net.azisaba.vanilife.font.HudFont
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import java.util.*
 
 object HudRunnable: Runnable {
-    private val animationStateMap = mutableMapOf<UUID, AnimationState>()
+    private val cacheMap = mutableMapOf<UUID, TickCache>()
 
-    private const val ANIMATION_TICKS = 8
-    private const val DISPLAY_TICKS = 6
-    private const val WOBBLE_ANIMATION_TICKS = 5
+    private val levelAnimationStateMap = mutableMapOf<UUID, LevelAnimationState>()
+    private val moneyAnimationStateMap = mutableMapOf<UUID, MoneyAnimationState>()
+
+    private const val LEVEL_ANIMATION_TICKS = 28
+
+    private const val MONEY_ANIMATION_TICKS = 6
+    private const val MONEY_ANIMATION_DISPLAY_TICKS = 16
 
     override fun run() {
         for (player in Bukkit.getOnlinePlayers()) {
@@ -22,60 +27,105 @@ object HudRunnable: Runnable {
                 continue
             }
 
-            val uuid = player.uniqueId
+            val level = player.scoreLevel
             val money = player.money
-            val state = animationStateMap[uuid]
 
-            if (state == null || state.money != money) {
-                animationStateMap[uuid] = AnimationState(
-                    money = money,
-                    targetDifference = money - (state?.money ?: money)
-                )
+            val uuid = player.uniqueId
+            val cache = cacheMap[uuid] ?: TickCache(level, money)
+
+            cacheMap[uuid] = TickCache(level, money)
+
+            if (cache.level == level && cache.money == money && !levelAnimationStateMap.containsKey(uuid) && !moneyAnimationStateMap.containsKey(uuid)) {
+                player.sendHud(level = Component.text(level.toString().padStart(2, '0')), money = Component.text(money))
+                continue
             }
 
-            val currentState = animationStateMap[uuid]!!
+            val levelAnimationState = levelAnimationStateMap[uuid] ?: run {
+                if (cache.level != level) LevelAnimationState(level > cache.level, LEVEL_ANIMATION_TICKS).also { levelAnimationStateMap[uuid] = it } else null
+            }
 
-            val targetDifference = currentState.targetDifference
-            val displayedDifference = currentState.displayedDifference
-            val remainingTicks = currentState.remainingTicks
-            val wobbleAnimationTicks = currentState.wobbleAnimationTicks
+            val moneyAnimationState = moneyAnimationStateMap[uuid] ?: run {
+                if (cache.money != money) MoneyAnimationState(targetDifference = money - (cache.money)).also { moneyAnimationStateMap[uuid] = it } else null
+            }
 
-            if (remainingTicks > 0) {
-                val difference = targetDifference - displayedDifference
-                val step = difference / remainingTicks - DISPLAY_TICKS
+            var levelComponent = Component.text(level.toString().padStart(2, '0'))
+            var levelIcon = HudFont.levelIcon(level)
 
-                currentState.remainingTicks--
+            if (levelAnimationState != null) {
+                val remainingTicks = levelAnimationState.remainingTicks
 
-                if (remainingTicks > DISPLAY_TICKS) {
-                    currentState.displayedDifference += step
-
-                    if (currentState.wobbleAnimationTicks > 0) {
-                        currentState.wobbleAnimationTicks--
+                if (((remainingTicks - 1) / 2 % 3 + 1) == 1) {
+                    levelComponent = levelComponent.color(NamedTextColor.WHITE)
+                    levelIcon = if (levelAnimationState.levelUp) {
+                        HudFont.levelUpIcon(level, true)
                     } else {
-                        currentState.wobbleAnimationTicks = WOBBLE_ANIMATION_TICKS
+                        HudFont.levelDownIcon(level, true)
                     }
                 } else {
-                    currentState.displayedDifference = targetDifference
+                    levelComponent = levelComponent.color(NamedTextColor.GRAY)
+                    levelIcon = if (levelAnimationState.levelUp) {
+                        HudFont.levelUpIcon(level)
+                    } else {
+                        HudFont.levelDownIcon(level)
+                    }
                 }
 
-                player.sendMoneyHud(String.format("%+d", currentState.displayedDifference), if (targetDifference >= 0) TextColor.color(0, 176, 107) else TextColor.color(255, 75, 0),
-                    when (wobbleAnimationTicks) {
-                        2 -> HudFont.moneyWobble1
-                        0 -> HudFont.moneyWobble2
-                        else -> HudFont.money
-                    }
-                )
-            } else {
-                player.sendMoneyHud(money.toString())
+                levelAnimationState.remainingTicks--
             }
+
+            var moneyComponent = Component.text(money)
+            var moneyIcon = HudFont.MONEY
+
+            if (moneyAnimationState != null) {
+                val targetDifference = moneyAnimationState.targetDifference
+                val displayedDifference = moneyAnimationState.displayedDifference
+                val remainingTicks = moneyAnimationState.remainingTicks
+
+                val difference = targetDifference - displayedDifference
+                val step = difference / remainingTicks - MONEY_ANIMATION_DISPLAY_TICKS
+
+                moneyAnimationState.remainingTicks--
+
+                if (remainingTicks > MONEY_ANIMATION_DISPLAY_TICKS) {
+                    moneyAnimationState.displayedDifference += step
+                    moneyComponent = Component.text(String.format("%+d", moneyAnimationState.displayedDifference))
+                } else {
+                    moneyComponent = Component.text(String.format("%+d", moneyAnimationState.targetDifference))
+                }
+
+                moneyComponent = moneyComponent.color(if (targetDifference >= 0) NamedTextColor.GREEN else NamedTextColor.RED)
+
+                moneyIcon = when ((remainingTicks - 1) / 2 % 3 + 1) {
+                    1 -> if (targetDifference >= 0) HudFont.MONEY_IN else HudFont.MONEY_OUT
+                    else -> if (targetDifference >= 0) HudFont.MONEY_IN_FLASH else HudFont.MONEY_OUT_FLASH
+                }
+            }
+
+            if (levelAnimationState != null && levelAnimationState.remainingTicks <= 0) {
+                levelAnimationStateMap.remove(uuid)
+            }
+
+            if (moneyAnimationState != null && moneyAnimationState.remainingTicks <= 0) {
+                moneyAnimationStateMap.remove(uuid)
+            }
+
+            player.sendHud(levelComponent, levelIcon, moneyComponent, moneyIcon)
         }
     }
 
-    private data class AnimationState(
-        val money: Int,
+    private data class TickCache(
+        val level: Int,
+        val money: Int
+    )
+
+    private data class LevelAnimationState(
+        val levelUp: Boolean,
+        var remainingTicks: Int
+    )
+
+    private data class MoneyAnimationState(
         val targetDifference: Int,
         var displayedDifference: Int = 0,
-        var remainingTicks: Int = ANIMATION_TICKS + DISPLAY_TICKS,
-        var wobbleAnimationTicks: Int = WOBBLE_ANIMATION_TICKS
+        var remainingTicks: Int = MONEY_ANIMATION_TICKS + MONEY_ANIMATION_DISPLAY_TICKS,
     )
 }

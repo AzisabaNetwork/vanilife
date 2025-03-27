@@ -6,7 +6,6 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.listener.*
-import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
@@ -20,7 +19,9 @@ class Vanilife : JavaPlugin() {
     companion object {
         const val PLUGIN_ID = "vanilife"
 
-        const val DATABASE_PLAY_BOOST = "play_boost"
+        const val DATABASE_PLAYER = "player"
+        const val DATABASE_PLAYER_CHAPTER = "player_chapter"
+        const val DATABASE_PLAYER_OBJECTIVE = "player_objective"
 
         lateinit var plugin: Vanilife
 
@@ -63,14 +64,14 @@ class Vanilife : JavaPlugin() {
         saveDefaultConfig()
         reloadPluginConfig()
 
-        createTableIfNotExists(DATABASE_PLAY_BOOST, ":player VARCHAR(36) NOT NULL, boost_key VARCHAR(64) NOT NULL, boost_value INT UNSIGNED NOT NULL, PRIMARY KEY (player, boost_key)")
+        createTableIfNotExists(DATABASE_PLAYER, ":uuid VARCHAR(36) NOT NULL PRIMARY KEY, score SMALLINT UNSIGNED NOT NULL")
+        createTableIfNotExists(DATABASE_PLAYER_CHAPTER, ":player VARCHAR(36) NOT NULL, chapter VARCHAR(256) NOT NULL, PRIMARY KEY (player, chapter)")
+        createTableIfNotExists(DATABASE_PLAYER_OBJECTIVE, ":player VARCHAR(36) NOT NULL, objective VARCHAR(256) NOT NULL, PRIMARY KEY (player, objective)")
 
-        server.pluginManager.registerEvents(CaveniumListener, this)
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
         server.pluginManager.registerEvents(LootListener, this)
-        server.pluginManager.registerEvents(PlayerListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
 
         runTaskTimerAsync(0, 1, HudRunnable)

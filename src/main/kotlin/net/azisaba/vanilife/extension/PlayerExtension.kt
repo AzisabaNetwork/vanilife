@@ -1,15 +1,87 @@
 package net.azisaba.vanilife.extension
 
+import io.papermc.paper.adventure.PaperAdventure
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.chapter.Chapter
+import net.azisaba.vanilife.chapter.Objective
 import net.azisaba.vanilife.font.HudFont
 import net.azisaba.vanilife.item.MoneyItemType
-import net.azisaba.vanilife.playboost.PlayBoost
+import net.azisaba.vanilife.registry.Chapters
+import net.azisaba.vanilife.util.runTaskLater
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.ShadowColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.AdvancementHolder
+import net.minecraft.advancements.AdvancementProgress
+import net.minecraft.advancements.AdvancementRequirements
+import net.minecraft.advancements.AdvancementRewards
+import net.minecraft.advancements.AdvancementType
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.DisplayInfo
+import net.minecraft.advancements.critereon.ImpossibleTrigger
+import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket
+import net.minecraft.resources.ResourceLocation
+import org.bukkit.OfflinePlayer
+import org.bukkit.craftbukkit.entity.CraftPlayer
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
+import java.util.*
+
+private val SCORE_CACHE = mutableMapOf<UUID, Int>()
+
+var OfflinePlayer.score: Int
+    get() {
+        if (SCORE_CACHE.containsKey(uniqueId)) {
+            return SCORE_CACHE[uniqueId]!!
+        }
+
+        Vanilife.dataSource.connection.use { connection ->
+            connection.prepareStatement("SELECT score FROM ${Vanilife.DATABASE_PLAYER} WHERE uuid = ?").use { preparedStatement ->
+                preparedStatement.setString(1, uniqueId.toString())
+                preparedStatement.executeQuery().use { resultSet ->
+                    if (resultSet.next()) {
+                        return resultSet.getInt("score").also {
+                            SCORE_CACHE[uniqueId] = it
+                        }
+                    }
+                }
+            }
+
+            connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER} VALUES (?, ?)").use { preparedStatement ->
+                preparedStatement.setString(1, uniqueId.toString())
+                preparedStatement.setInt(2, 0)
+                preparedStatement.executeUpdate()
+                SCORE_CACHE[uniqueId] = 0
+                return 0
+            }
+        }
+    }
+    set(value) {
+        if (value == score || value < 0 || value > maximumScore) {
+            return
+        }
+
+        Vanilife.dataSource.connection.use { connection ->
+            connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER} (uuid, score) VALUES (?, ?) ON DUPLICATE KEY UPDATE score = ?").use { preparedStatement ->
+                preparedStatement.setString(1, uniqueId.toString())
+                preparedStatement.setInt(2, value)
+                preparedStatement.setInt(3, value)
+                preparedStatement.executeUpdate()
+            }
+        }
+
+        SCORE_CACHE[uniqueId] = value
+    }
+
+val OfflinePlayer.scoreLevel: Int
+    get() = score / 100
+
+val OfflinePlayer.maximumScore: Int
+    get() = 99 * 100
 
 var Player.money: Int
     get() {
@@ -49,70 +121,47 @@ var Player.money: Int
         }
     }
 
-fun Player.getPlayBoost(playBoost: PlayBoost): Int {
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("SELECT boost_value FROM ${Vanilife.DATABASE_PLAY_BOOST} WHERE player = ? AND boost_key = ?").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, playBoost.key.asString())
-            preparedStatement.executeQuery().use { resultSet ->
-                if (!resultSet.next()) {
-                    return 0
-                } else {
-                    return resultSet.getInt("boost_value")
-                }
-            }
-        }
-    }
-}
+val OfflinePlayer.chapters: Set<Chapter>
+    get() = Chapters.values.filter { it.isGranted(this) }.toSet()
 
-fun Player.setPlayBoost(playBoost: PlayBoost, value: Int) {
-    Vanilife.dataSource.connection.use { connection ->
-        if (value <= 0) {
-            connection.prepareStatement("DELETE FROM ${Vanilife.DATABASE_PLAY_BOOST} WHERE player = ? AND boost_key = ?").use { preparedStatement ->
-                preparedStatement.setString(1, uniqueId.toString())
-                preparedStatement.setString(2, playBoost.key.asString())
-                preparedStatement.executeUpdate()
-            }
-        } else if (!hasPlayBoost(playBoost)) {
-            connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAY_BOOST} VALUES (?, ?, ?)").use { preparedStatement ->
-                preparedStatement.setString(1, uniqueId.toString())
-                preparedStatement.setString(2, playBoost.key.asString())
-                preparedStatement.setInt(3, value)
-                preparedStatement.executeUpdate()
-            }
-        } else {
-            connection.prepareStatement("UPDATE ${Vanilife.DATABASE_PLAY_BOOST} SET boost_value = ? WHERE player = ? AND boost_key = ?").use { preparedStatement ->
-                preparedStatement.setInt(1, value)
-                preparedStatement.setString(2, uniqueId.toString())
-                preparedStatement.setString(3, playBoost.key.asString())
-                preparedStatement.executeUpdate()
-            }
-        }
-    }
-}
+val Player.objectives: Set<Objective>
+    get() = chapters.flatMap { it.objectives.filter { objective -> objective.isAchieved(this) } }.toSet()
 
-fun Player.hasPlayBoost(playBoost: PlayBoost): Boolean {
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("SELECT EXISTS (SELECT 1 FROM ${Vanilife.DATABASE_PLAY_BOOST} WHERE player = ? AND boost_key = ?)").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, playBoost.key.asString())
-            preparedStatement.executeQuery().use { resultSet ->
-                if (resultSet.next()) {
-                    val exists = resultSet.getBoolean(1)
-                    return exists
-                }
-                return false
-            }
-        }
-    }
-}
-
-fun Player.sendMoneyHud(money: String, textColor: TextColor = NamedTextColor.WHITE, icon: Char = HudFont.money) {
+fun Player.sendHud(level: ComponentLike, levelIcon: Char = HudFont.levelIcon(scoreLevel), money: ComponentLike, moneyIcon: Char = HudFont.MONEY) {
     if (remainingAir < maximumAir) {
         sendActionBar(Component.empty())
         return
     }
 
-    sendActionBar(Component.text("${HudFont.space88}$icon").font(HudFont)
-        .append(Component.text(money.padEnd(10, HudFont.space6)).color(textColor)))
+    sendActionBar(Component.text("${HudFont.SPACE88}").font(HudFont)
+        .append(Component.text(levelIcon))
+        .append(Component.text(level.plainText().padEnd(3, HudFont.SPACE6)).style(level.asComponent().style()).decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE))
+        .append(Component.text(moneyIcon)
+        .append(Component.text(money.plainText().padEnd(10, HudFont.SPACE6)).style(money.asComponent().style()).shadowColorIfAbsent(ShadowColor.shadowColor(48, 23, 2, 255)))))
+}
+
+fun Player.sendToast(icon: ItemStack, message: ComponentLike) {
+    val resourceLocation = ResourceLocation.fromNamespaceAndPath(Vanilife.PLUGIN_ID, UUID.randomUUID().toString())
+
+    val nmsIcon = CraftItemStack.asNMSCopy(icon)
+    val nmsMessage = PaperAdventure.asVanilla(message.asComponent())
+
+    val criteria = mapOf(Pair("impossible", Criterion(ImpossibleTrigger(), ImpossibleTrigger.TriggerInstance())))
+    val requirements = AdvancementRequirements(listOf(listOf("impossible")))
+
+    val displayInfo = DisplayInfo(nmsIcon, nmsMessage, net.minecraft.network.chat.Component.empty(), Optional.empty(), AdvancementType.TASK, true, false, true)
+    val advancement = Advancement(Optional.empty(), Optional.of(displayInfo), AdvancementRewards(0, emptyList(), emptyList(), Optional.empty()), criteria, requirements, false)
+
+    val progress = AdvancementProgress().apply {
+        update(requirements)
+        getCriterion("impossible")!!.grant()
+    }
+
+    val connection = (this as CraftPlayer).handle.connection
+
+    connection.send(ClientboundUpdateAdvancementsPacket(false, listOf(AdvancementHolder(resourceLocation, advancement)), emptySet(), mapOf(Pair(resourceLocation, progress))))
+
+    runTaskLater(1) {
+        connection.send(ClientboundUpdateAdvancementsPacket(false, emptyList(), setOf(resourceLocation), emptyMap()))
+    }
 }

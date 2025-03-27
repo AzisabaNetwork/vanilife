@@ -8,13 +8,97 @@ object HudFont: Font, Registry<String, Char>() {
     override val key: Key
         get() = Key.key(Vanilife.PLUGIN_ID, "hud")
 
-    val money = register(":money:", '\uE001')
+    val LEVEL_BLUE = register("level_blue", '\uE001')
+    
+    val LEVEL_UP_BLUE = register("level_up_blue", '\uE002')
 
-    val moneyWobble1 = register(":money_wobble1:", '\uE002')
+    val LEVEL_UP_BLUE_FLASH = register("level_up_blue_flash", '\uE003')
 
-    val moneyWobble2 = register(":money_wobble2:", '\uE003')
+    val LEVEL_DOWN_BLUE = register("level_down_blue", '\uE004')
 
-    val space6 = register(":space6:", '\uE004')
+    val LEVEL_DOWN_BLUE_FLASH = register("level_down_blue_flash", '\uE005')
 
-    val space88 = register(":space88:", '\uE005')
+    val LEVEL_YELLOW = register("level_yellow", '\uE006')
+
+    val LEVEL_UP_YELLOW = register("level_up_yellow", '\uE007')
+
+    val LEVEL_UP_YELLOW_FLASH = register("level_up_yellow_flash", '\uE008')
+
+    val LEVEL_DOWN_YELLOW = register("level_down_yellow", '\uE009')
+
+    val LEVEL_DOWN_YELLOW_FLASH = register("level_down_yellow_flash", '\uE010')
+
+    val LEVEL_GREEN = register("level_green", '\uE011')
+
+    val LEVEL_UP_GREEN = register("level_up_green", '\uE012')
+
+    val LEVEL_UP_GREEN_FLASH = register("level_up_green_flash", '\uE013')
+    
+    val LEVEL_DOWN_GREEN = register("level_down_green", '\uE014')
+    
+    val LEVEL_DOWN_GREEN_FLASH = register("level_down_green_flash", '\uE015')
+    
+    val LEVEL_PINK = register("level_pink", '\uE016')
+    
+    val LEVEL_UP_PINK = register("level_up_pink", '\uE017')
+    
+    val LEVEL_UP_PINK_FLASH = register("level_up_pink_flash", '\uE018')
+    
+    val LEVEL_DOWN_PINK = register("level_down_pink", '\uE019')
+    
+    val LEVEL_DOWN_PINK_FLASH = register("level_down_pink_flash", '\uE020')
+
+    val LEVEL_PURPLE = register("level_purple", '\uE021')
+
+    val LEVEL_UP_PURPLE = register("level_up_purple", '\uE022')
+
+    val LEVEL_UP_PURPLE_FLASH = register("level_up_purple_flash", '\uE023')
+
+    val LEVEL_DOWN_PURPLE = register("level_down_purple", '\uE024')
+    
+    val LEVEL_DOWN_PURPLE_FLASH = register("level_down_purple_flash", '\uE025')
+
+    val MONEY = register("money", '\uE026')
+
+    val MONEY_IN = register("money_in", '\uE027')
+
+    val MONEY_IN_FLASH = register("money_in_flash", '\uE028')
+    
+    val MONEY_OUT = register("money_out", '\uE029')
+
+    val MONEY_OUT_FLASH = register("money_out_flash", '\uE030')
+
+    val SPACE6 = register("space6", '\uE031')
+
+    val SPACE88 = register("space88", '\uE032')
+
+    fun levelIcon(level: Int): Char {
+        return get("level_${levelColor(level)}")!!
+    }
+
+    fun levelUpIcon(level: Int, flash: Boolean = false): Char {
+        return if (!flash) {
+            get("level_up_${levelColor(level)}")!!
+        } else {
+            get("level_up_${levelColor(level)}_flash")!!
+        }
+    }
+
+    fun levelDownIcon(level: Int, flash: Boolean = false): Char {
+        return if (!flash) {
+            get("level_down_${levelColor(level)}")!!
+        } else {
+            get("level_down_${levelColor(level)}_flash")!!
+        }
+    }
+
+    private fun levelColor(level: Int): String {
+        return when (level) {
+            in 0..9 -> "blue"
+            in 10..19 -> "yellow"
+            in 20..29 -> "green"
+            in 30..39 -> "pink"
+            else -> "purple"
+        }
+    }
 }
