@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.jetbrains.annotations.Range
 
-class MoneyItemType private constructor(override val price: Int): CustomItemType, Priced {
+class MoneyItemType private constructor(override val price: Int): Priced {
     companion object {
         val MONEY_1000 = MoneyItemType(1000)
         val MONEY_5000 = MoneyItemType(5000)

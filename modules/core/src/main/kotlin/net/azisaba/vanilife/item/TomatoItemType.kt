@@ -1,26 +1,23 @@
 package net.azisaba.vanilife.item
 
+import net.azisaba.vanilife.Season
 import net.azisaba.vanilife.Vanilife
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
-object TomatoItemType: Food {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "tomato")
+object TomatoItemType: Seasoned, Vegetable {
+    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "tomato")
 
-    override val itemType: ItemType
-        get() = ItemType.STICK
+    override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "tomato")
+    override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "tomato")
 
-    override val displayName: Component
-        get() = Component.translatable("item.vanilife.tomato")
+    override val displayName: Component = Component.translatable("item.vanilife.tomato")
 
-    override val foodNutrition: Int
-        get() = 5
+    override val season: Set<Season> = setOf(Season.SUMMER)
 
-    override val foodSaturation: Float
-        get() = 2.8F
+    override val nutrition: Int = 5
+
+    override val saturation: Float = 2.8F
 }

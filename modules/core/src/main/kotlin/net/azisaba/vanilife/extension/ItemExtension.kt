@@ -66,9 +66,9 @@ fun CustomItemType.createItemStack(amount: @Range(from = 1, to = 99) Int = 1): I
 
     if (this is Food) {
         itemStack.setData(DataComponentTypes.FOOD, FoodProperties.food().apply {
-            foodNutrition?.let { nutrition(it) }
-            foodSaturation?.let { saturation(it) }
-            foodCanAlwaysEat?.let { canAlwaysEat(it) }
+            nutrition?.let { nutrition(it) }
+            saturation?.let { saturation(it) }
+            canAlwaysEat?.let { canAlwaysEat(it) }
         })
     }
 

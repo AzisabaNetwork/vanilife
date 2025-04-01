@@ -6,21 +6,15 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
 object ButteredPotatoItemType: Food {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "buttered_potato")
+    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "buttered_potato")
 
-    override val itemType: ItemType
-        get() = ItemType.STICK
+    override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "buttered_potato")
+    override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "buttered_potato")
 
-    override val displayName: Component
-        get() = Component.translatable("item.vanilife.buttered_potato")
+    override val displayName: Component = Component.translatable("item.vanilife.buttered_potato")
 
-    override val foodNutrition: Int
-        get() = 6
+    override val nutrition: Int = 6
 
-    override val foodSaturation: Float
-        get() = 7F
+    override val saturation: Float = 7F
 }

@@ -1,12 +1,12 @@
 package net.azisaba.vanilife.item
 
 interface Food: Consumable {
-    val foodNutrition: Int?
+    val nutrition: Int?
         get() = null
 
-    val foodSaturation: Float?
+    val saturation: Float?
         get() = null
 
-    val foodCanAlwaysEat: Boolean?
+    val canAlwaysEat: Boolean?
         get() = null
 }

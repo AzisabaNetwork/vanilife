@@ -6,15 +6,11 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
 object RockSaltItemType: CustomItemType {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "rock_salt")
+    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "rock_salt")
 
-    override val itemType: ItemType
-        get() = ItemType.STICK
+    override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "rock_salt")
+    override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "rock_salt")
 
-    override val displayName: Component
-        get() = Component.translatable("item.vanilife.rock_salt")
+    override val displayName: Component = Component.translatable("item.vanilife.rock_salt")
 }

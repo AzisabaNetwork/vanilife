@@ -75,6 +75,7 @@ class Vanilife : JavaPlugin() {
         // server.pluginManager.registerEvents(FishingListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
+        server.pluginManager.registerEvents(VillagerListener, this)
 
         runTaskTimerAsync(0, 1, FishingHudRunnable)
         runTaskTimerAsync(0, 1, HudRunnable)

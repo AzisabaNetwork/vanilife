@@ -2,6 +2,8 @@ package net.azisaba.vanilife.registry
 
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.extension.*
+import net.azisaba.vanilife.item.CustomItemType
+import net.azisaba.vanilife.item.Fruit
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -22,18 +24,6 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         addIngredient(CustomItemTypes.SALT.createItemStack())
     })
 
-    val BULK_MINING_LV1_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "bulk_mining_lv1_enchanted_book").toNamespacedKey(), CustomEnchantments.BULK_MINING.paperEnchantment().createEnchantedBook()).apply {
-        shape("CCC", "CBC", "CCC")
-        setIngredient('C', CustomItemTypes.CAVENIUM.createItemStack())
-        setIngredient('B', CustomItemTypes.BULK_MINING_BOOK.createItemStack())
-    })
-
-    val BULK_MINING_LV2_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "bulk_mining_lv2_enchanted_book").toNamespacedKey(), CustomEnchantments.BULK_MINING.paperEnchantment().createEnchantedBook(level = 2)).apply {
-        shape("CCC", "CBC", "CCC")
-        setIngredient('C', CustomItemTypes.COMPRESSED_CAVENIUM.createItemStack())
-        setIngredient('B', CustomItemTypes.BULK_MINING_BOOK.createItemStack())
-    })
-
     val BUTTER = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "butter").toNamespacedKey(), CustomItemTypes.BUTTER.createItemStack()).apply {
         addIngredient(Material.MILK_BUCKET)
         addIngredient(CustomItemTypes.SALT.createItemStack())
@@ -50,23 +40,13 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         addIngredient(CustomItemTypes.ROCK_SALT.createItemStack())
     })
 
-    val COMPRESSED_CAVENIUM = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "compressed_cavenium").toNamespacedKey(), CustomItemTypes.COMPRESSED_CAVENIUM.createItemStack()).apply {
-        addIngredient(9, CustomItemTypes.CAVENIUM.createItemStack())
-    })
-
     val DOUGH = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "dough").toNamespacedKey(), CustomItemTypes.DOUGH.createItemStack()).apply {
         addIngredient(Material.WATER_BUCKET)
         addIngredient(CustomItemTypes.SALT.createItemStack())
         addIngredient(CustomItemTypes.WHEAT_FLOUR.createItemStack())
     })
 
-    val FRUIT_SANDWICH = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "sandwich").toNamespacedKey(), CustomItemTypes.SANDWICH.createItemStack()).apply {
-        shape("WWW", "SGB", "WWW")
-        setIngredient('W', CustomItemTypes.WHITE_BREAD.createItemStack())
-        setIngredient('S', CustomItemTypes.STRAWBERRY.createItemStack())
-        setIngredient('G', CustomItemTypes.GRAPE.createItemStack())
-        setIngredient('B', CustomItemTypes.BANANA.createItemStack())
-    })
+    val FRUIT_SANDWICH = createSandwichRecipes("sruit_sandwich", CustomItemTypes.FRUIT_SANDWICH, CustomItemTypes.filter { it is Fruit })
 
     val KNIFE = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "knife").toNamespacedKey(), CustomItemTypes.KNIFE.createItemStack()).apply {
         shape("I", "S")
@@ -74,27 +54,9 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         setIngredient('S', ItemType.STICK.createItemStack())
     })
 
-    val MAGNITE_MINING_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "magnite_mining_enchanted_book").toNamespacedKey(), CustomEnchantments.MAGNITE_MINING.paperEnchantment().createEnchantedBook()).apply {
-        shape("MMM", "MBM", "MMM")
-        setIngredient('M', CustomItemTypes.MAGNITE.createItemStack())
-        setIngredient('B', CustomItemTypes.MAGNITE_MINING_BOOK.createItemStack())
-    })
-
     val MAYONNAISE = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "mayonnaise").toNamespacedKey(), CustomItemTypes.MAYONNAISE.createItemStack()).apply {
         addIngredient(ItemType.EGG.createItemStack())
         addIngredient(ItemType.GLASS_BOTTLE.createItemStack())
-    })
-
-    val RANGE_MINING_LV1_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "range_mining_lv1_enchanted_book").toNamespacedKey(), CustomEnchantments.RANGE_MINING.paperEnchantment().createEnchantedBook()).apply {
-        shape("CCC", "CBC", "CCC")
-        setIngredient('C', CustomItemTypes.CAVENIUM.createItemStack())
-        setIngredient('B', CustomItemTypes.RANGE_MINING_BOOK.createItemStack())
-    })
-
-    val RANGE_MINING_LV2_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "range_mining_lv2_enchanted_book").toNamespacedKey(), CustomEnchantments.RANGE_MINING.paperEnchantment().createEnchantedBook(level = 2)).apply {
-        shape("CCC", "CBC", "CCC")
-        setIngredient('C', CustomItemTypes.COMPRESSED_CAVENIUM.createItemStack())
-        setIngredient('B', CustomItemTypes.RANGE_MINING_BOOK.createItemStack())
     })
 
     val SALT = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "salt").toNamespacedKey(), CustomItemTypes.SALT.createItemStack()).apply {
@@ -102,13 +64,7 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         setIngredient('R', CustomItemTypes.ROCK_SALT.createItemStack())
     })
 
-    val SANDWICH = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "sandwich").toNamespacedKey(), CustomItemTypes.SANDWICH.createItemStack()).apply {
-        shape("WWW", "BLT", "WWW")
-        setIngredient('W', CustomItemTypes.WHITE_BREAD.createItemStack())
-        setIngredient('B', CustomItemTypes.BACON.createItemStack())
-        setIngredient('L', CustomItemTypes.LETTUCE.createItemStack())
-        setIngredient('T', CustomItemTypes.TOMATO.createItemStack())
-    })
+    val SANDWICH = createSandwichRecipes("sandwich", CustomItemTypes.SANDWICH, listOf(CustomItemTypes.BACON, CustomItemTypes.LETTUCE, CustomItemTypes.SLICED_TOMATO))
 
     val SLICED_TOMATO = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "sliced_tomato").toNamespacedKey(), CustomItemTypes.SLICED_TOMATO.createItemStack(3)).apply {
         addIngredient(CustomItemTypes.TOMATO.createItemStack())
@@ -132,4 +88,45 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
         addIngredient(Material.SUGAR)
         addIngredient(Material.WHEAT)
     })
+
+    private fun createSandwichRecipes(name: String, result: CustomItemType, fillings: List<CustomItemType>): List<ShapedRecipe> {
+        if (fillings.size < 3) {
+            throw IllegalArgumentException("Filling must be 3 or more.")
+        }
+
+        val recipes = mutableListOf<ShapedRecipe>()
+        val size = fillings.size
+
+        for (i in 0 until size) {
+            for (j in 0 until size) {
+                if (i == j) {
+                    continue
+                }
+
+                for (k in 0 until size) {
+                    if (k == i || k == j) {
+                        continue
+                    }
+
+                    val filling1 = fillings[i]
+                    val filling2 = fillings[j]
+                    val filling3 = fillings[k]
+
+                    val key = Key.key(Vanilife.PLUGIN_ID, "${name}_${filling1.key().value()}_${filling2.key().value()}_${filling3.key().value()}")
+                    val recipe = ShapedRecipe(key.toNamespacedKey(), result.createItemStack()).apply {
+                        shape("BBB", "XYZ", "BBB")
+                        setIngredient('B', CustomItemTypes.WHITE_BREAD.createItemStack())
+                        setIngredient('X', filling1.createItemStack())
+                        setIngredient('Y', filling2.createItemStack())
+                        setIngredient('Z', filling3.createItemStack())
+                    }
+
+                    register(recipe)
+                    recipes.add(recipe)
+                }
+            }
+        }
+
+        return recipes
+    }
 }

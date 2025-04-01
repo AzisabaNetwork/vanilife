@@ -7,18 +7,13 @@ import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 
 object CaveniumItemType: CustomItemType {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "cavenium")
+    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "cavenium")
 
-    override val itemType: ItemType
-        get() = ItemType.STICK
+    override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "cavenium")
+    override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "cavenium")
 
-    override val displayName: Component
-        get() = Component.translatable("item.vanilife.cavenium")
+    override val displayName: Component = Component.translatable("item.vanilife.cavenium")
 
-    override val rarity: ItemRarity
-        get() = ItemRarity.UNCOMMON
+    override val rarity: ItemRarity = ItemRarity.UNCOMMON
 }
