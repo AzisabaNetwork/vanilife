@@ -12,8 +12,7 @@ enum class Season(val color: TextColor) {
     companion object {
         val now: Season
             get() {
-                // val month = LocalDate.now().monthValue
-                val month = 8
+                val month = LocalDate.now().monthValue
                 return when (month) {
                     in 3..5 -> SPRING
                     in 6..8 -> SUMMER

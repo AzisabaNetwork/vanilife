@@ -6,6 +6,7 @@ import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import net.kyori.adventure.util.RGBLike
 
 fun ComponentLike.font(font: Font): Component {
     return asComponent().font(font.key)
@@ -17,4 +18,9 @@ fun ComponentLike.normalized(): Component {
 
 fun ComponentLike.plainText(): String {
     return PlainTextComponentSerializer.plainText().serialize(asComponent())
+}
+
+fun RGBLike.toInt(): Int {
+    require(red() in 0..255 && green() in 0..255 && blue() in 0..255)
+    return (red() shl 16) or (green() shl 8) or blue()
 }

@@ -4,8 +4,10 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.decodeFromStream
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import net.azisaba.vanilife.adapter.Adapter
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.listener.*
+import net.azisaba.vanilife.registry.CustomBiomes
 import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.HudRunnable
@@ -32,6 +34,9 @@ class Vanilife : JavaPlugin() {
 
         val logger: ComponentLogger
             get() = plugin.componentLogger
+
+        val adapter: Adapter
+            get() = V1_21_4
 
         fun reloadPluginConfig() {
             pluginConfig = Yaml.default.decodeFromStream(File(plugin.dataFolder, "config.yml").inputStream())
@@ -79,6 +84,10 @@ class Vanilife : JavaPlugin() {
 
         runTaskTimerAsync(0, 1, FishingHudRunnable)
         runTaskTimerAsync(0, 1, HudRunnable)
+
+        for (customBiome in CustomBiomes) {
+            adapter.registerBiome(customBiome)
+        }
 
         for (recipe in CustomRecipes) {
             Bukkit.addRecipe(recipe)
