@@ -1,5 +1,6 @@
 package net.azisaba.vanilife.biome
 
+import net.azisaba.vanilife.Range
 import net.azisaba.vanilife.entity.MobCategory
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.util.RGBLike
@@ -19,6 +20,19 @@ interface CustomBiome: Keyed {
 
     val spawners: List<Spawner>
 
+    val climate: Climate?
+        get() = null
+
+    data class Climate(
+        val temperature: Range<Float>,
+        val humidity: Range<Float>,
+        val continentalness: Range<Float>,
+        val erosion: Range<Float>,
+        val depth: Range<Float>,
+        val weirdness: Range<Float>,
+        val offset: Long = 0
+    )
+
     data class Effects(
         val fogColor: RGBLike,
         val waterColor: RGBLike,
@@ -30,8 +44,7 @@ interface CustomBiome: Keyed {
     data class Spawner(
         val mobCategory: MobCategory,
         val entityType: EntityType,
-        val minCount: Int,
-        val maxCount: Int,
+        val count: Range<Int>,
         val weight: Int
     )
 

@@ -1,5 +1,6 @@
 package net.azisaba.vanilife.biome
 
+import net.azisaba.vanilife.Range
 import net.azisaba.vanilife.Vanilife
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.format.TextColor
@@ -21,4 +22,14 @@ object SaltLake: CustomBiome {
     )
 
     override val spawners: List<CustomBiome.Spawner> = emptyList()
+
+    override val climate: CustomBiome.Climate = CustomBiome.Climate(
+        Range(0.25F, 0.65F),
+        Range(-0.5F, 0.35F),
+        Range(-0.45F, 0.8F),
+        Range(-0.9799F, 0.775F),
+        Range(0F, 0F),
+        Range(-0.3F, 0.9333F),
+        0
+    )
 }

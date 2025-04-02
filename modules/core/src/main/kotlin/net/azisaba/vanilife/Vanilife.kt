@@ -5,7 +5,9 @@ import com.charleskorn.kaml.decodeFromStream
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.adapter.Adapter
+import net.azisaba.vanilife.biome.ParameterList
 import net.azisaba.vanilife.data.Config
+import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.listener.*
 import net.azisaba.vanilife.registry.CustomBiomes
 import net.azisaba.vanilife.registry.CustomRecipes
@@ -13,8 +15,10 @@ import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.util.runTaskTimerAsync
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
+import org.bukkit.WorldCreator
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -77,7 +81,6 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
-        // server.pluginManager.registerEvents(FishingListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
         server.pluginManager.registerEvents(VillagerListener, this)
@@ -86,12 +89,15 @@ class Vanilife : JavaPlugin() {
         runTaskTimerAsync(0, 1, HudRunnable)
 
         for (customBiome in CustomBiomes) {
-            adapter.registerBiome(customBiome)
+            adapter.registerCustomBiome(customBiome)
         }
 
         for (recipe in CustomRecipes) {
             Bukkit.addRecipe(recipe)
         }
+
+        val creator = WorldCreator(Key.key(PLUGIN_ID, "test").toNamespacedKey()).biomeProvider(adapter.createBiomeProvider(ParameterList.OVERWORLD, CustomBiomes.SALT_LAKE))
+        creator.createWorld()
     }
 
     override fun onDisable() {
