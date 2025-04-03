@@ -1,4 +1,4 @@
-package net.azisaba.vanilife.biome
+package net.azisaba.vanilife.world.biome
 
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key

@@ -1,7 +1,7 @@
 package net.azisaba.vanilife.adapter
 
-import net.azisaba.vanilife.biome.CustomBiome
-import net.azisaba.vanilife.biome.ParameterList
+import net.azisaba.vanilife.world.biome.CustomBiome
+import net.azisaba.vanilife.world.biome.ParameterList
 import org.bukkit.generator.BiomeProvider
 
 interface Adapter {

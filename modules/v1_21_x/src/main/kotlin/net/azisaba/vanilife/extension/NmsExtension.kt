@@ -1,7 +1,7 @@
 package net.azisaba.vanilife.extension
 
-import net.azisaba.vanilife.biome.CustomBiome
-import net.azisaba.vanilife.biome.ParameterList
+import net.azisaba.vanilife.world.biome.CustomBiome
+import net.azisaba.vanilife.world.biome.ParameterList
 import net.azisaba.vanilife.entity.MobCategory
 import net.azisaba.vanilife.util.getRegistry
 import net.kyori.adventure.key.Keyed

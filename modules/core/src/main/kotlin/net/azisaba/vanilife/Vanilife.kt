@@ -5,7 +5,6 @@ import com.charleskorn.kaml.decodeFromStream
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import net.azisaba.vanilife.adapter.Adapter
-import net.azisaba.vanilife.biome.ParameterList
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.listener.*
@@ -15,6 +14,8 @@ import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.util.runTaskTimerAsync
+import net.azisaba.vanilife.world.SimpleChunkGenerator
+import net.azisaba.vanilife.world.biome.ParameterList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
@@ -83,6 +84,7 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(ExchangeListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
+        server.pluginManager.registerEvents(SaltLakeListener, this)
         server.pluginManager.registerEvents(VillagerListener, this)
 
         runTaskTimerAsync(0, 1, FishingHudRunnable)
@@ -96,7 +98,8 @@ class Vanilife : JavaPlugin() {
             Bukkit.addRecipe(recipe)
         }
 
-        val creator = WorldCreator(Key.key(PLUGIN_ID, "test").toNamespacedKey()).biomeProvider(adapter.createBiomeProvider(ParameterList.OVERWORLD, CustomBiomes.SALT_LAKE))
+        val creator = WorldCreator(Key.key(PLUGIN_ID, "overworld").toNamespacedKey())
+            .generator(SimpleChunkGenerator(adapter.createBiomeProvider(ParameterList.OVERWORLD, CustomBiomes.SALT_LAKE)))
         creator.createWorld()
     }
 

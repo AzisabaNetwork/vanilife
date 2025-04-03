@@ -1,13 +1,12 @@
 package net.azisaba.vanilife.adapter
 
 import com.mojang.datafixers.util.Pair
-import net.azisaba.vanilife.biome.CustomBiome
-import net.azisaba.vanilife.biome.ParameterList
 import net.azisaba.vanilife.extension.frozen
 import net.azisaba.vanilife.extension.minecraft
-import net.azisaba.vanilife.extension.paper
 import net.azisaba.vanilife.util.getMappedRegistry
 import net.azisaba.vanilife.util.getRegistry
+import net.azisaba.vanilife.world.biome.CustomBiome
+import net.azisaba.vanilife.world.biome.ParameterList
 import net.minecraft.core.Holder
 import net.minecraft.core.RegistrationInfo
 import net.minecraft.core.registries.Registries
@@ -50,7 +49,7 @@ abstract class V1_21_x: Adapter {
         for (customBiome in customBiomes) {
             val climate = customBiome.climate ?: continue
 
-            parameters.add(Pair.of(climate.minecraft(), CraftBiome.bukkitToMinecraftHolder(customBiome.paper())))
+            parameters.add(Pair.of(climate.minecraft(), CraftBiome.bukkitToMinecraftHolder(customBiome.toPaperBiome())))
         }
 
         val generator = parameterList.minecraft().generator as NoiseBasedChunkGenerator
