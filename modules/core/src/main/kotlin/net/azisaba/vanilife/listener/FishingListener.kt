@@ -1,15 +1,22 @@
 package net.azisaba.vanilife.listener
 
-import net.azisaba.vanilife.util.runTaskTimer
-import org.bukkit.Material
+import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.runnable.LavaFishHookRunnable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerFishEvent
-import org.bukkit.event.player.PlayerInteractEvent
 
 object FishingListener: Listener {
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onPlayerFish(event: PlayerFishEvent) {
+        val player = event.player
+        val fishHook = player.fishHook ?: return
+
+        LavaFishHookRunnable(fishHook).runTaskTimer(Vanilife.plugin, 0, 1)
+    }
+
+    /* @EventHandler
     fun onPlayerFish(event: PlayerFishEvent) {
         val player = event.player
 
@@ -23,9 +30,9 @@ object FishingListener: Listener {
                 hook.velocity = oppositeDirection.multiply(0.2)
             }
         }
-    }
+    } */
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    /* @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val player = event.player
         val hook = player.fishHook
@@ -40,5 +47,5 @@ object FishingListener: Listener {
         val direction = player.eyeLocation.direction.normalize().apply { y = 0.0 }.normalize()
         val oppositeDirection = direction.multiply(1)
         hook.velocity = oppositeDirection.multiply(-0.3)
-    }
+    } */
 }

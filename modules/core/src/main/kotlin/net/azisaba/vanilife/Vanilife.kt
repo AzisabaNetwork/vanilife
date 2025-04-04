@@ -82,6 +82,7 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
+        server.pluginManager.registerEvents(FishingListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
         server.pluginManager.registerEvents(SaltLakeListener, this)
