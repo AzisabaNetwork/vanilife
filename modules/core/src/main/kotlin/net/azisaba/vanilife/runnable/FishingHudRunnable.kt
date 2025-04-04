@@ -2,6 +2,7 @@ package net.azisaba.vanilife.runnable
 
 import net.azisaba.vanilife.extension.sendFishingHud
 import org.bukkit.Bukkit
+import kotlin.math.sqrt
 
 object FishingHudRunnable: Runnable {
     override fun run() {
@@ -11,7 +12,13 @@ object FishingHudRunnable: Runnable {
                 continue
             }
 
-            player.sendFishingHud(hook.location.distance(player.location).toInt(), 0F)
+            val hookLocation = hook.location
+            val playerLocation = player.location
+
+            val deltaX = hookLocation.x - playerLocation.x
+            val deltaZ = hookLocation.z - playerLocation.z
+
+            player.sendFishingHud(sqrt(deltaX * deltaX + deltaZ * deltaZ).toInt(), 0F)
         }
     }
 }

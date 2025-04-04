@@ -7,12 +7,26 @@ import org.bukkit.entity.Snowball
 import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
-class LavaFishHookRunnable(private val fishHook: FishHook): BukkitRunnable() {
-    private var bobbingVehicle: Snowball? = null
+class LavaFishHookRunnable(val fishHook: FishHook): BukkitRunnable() {
+    companion object {
+        internal val instances
+            get() = _instances.toSet()
+
+        private val _instances = mutableSetOf<LavaFishHookRunnable>()
+    }
+
+    val bobbingVehicle
+        get() = _bobbingVehicle
+
+    private var _bobbingVehicle: Snowball? = null
+
+    init {
+        _instances.add(this)
+    }
 
     override fun run() {
-        if (fishHook.isDead || fishHook.isOnGround || fishHook.state != FishHook.HookState.UNHOOKED) {
-            bobbingVehicle?.remove()
+        if (fishHook.isDead || fishHook.state == FishHook.HookState.BOBBING) {
+            _bobbingVehicle?.remove()
             cancel()
             return
         }
@@ -21,7 +35,11 @@ class LavaFishHookRunnable(private val fishHook: FishHook): BukkitRunnable() {
         val fluidData = fishHookLocation.world.getFluidData(fishHookLocation)
 
         if (fluidData.fluidType != Fluid.LAVA) {
-            bobbingVehicle?.apply { velocity = velocity.zero() }?.let {
+            _bobbingVehicle?.apply {
+                if (velocity.y != 0.0) {
+                    velocity = velocity.apply { y = 0.0 }
+                }
+
                 if (Random.nextDouble() < 0.05) {
                     fishHookLocation.world.spawnParticle(Particle.LAVA, fishHookLocation, 1, 0.2, 0.2, 0.2)
                 }
@@ -29,21 +47,27 @@ class LavaFishHookRunnable(private val fishHook: FishHook): BukkitRunnable() {
             return
         }
 
-        val bobbingVehicle = bobbingVehicle ?: run {
+        if (_bobbingVehicle?.isDead == true) {
+            _bobbingVehicle = null
+        }
+
+        val bobbingVehicle = _bobbingVehicle ?: run {
             fishHookLocation.world.spawn(fishHookLocation.add(0.0, -0.25, 0.0), Snowball::class.java).apply {
-                isInvisible = false
+                isInvisible = true
                 isInvulnerable = true
-                isPersistent = false
+                isPersistent = true
                 isSilent = true
                 setGravity(false)
                 setNoPhysics(true)
                 addPassenger(fishHook)
-            }.also { this.bobbingVehicle = it }
+            }.also { _bobbingVehicle = it }
         }
 
-        bobbingVehicle.velocity = bobbingVehicle.velocity.apply {
-            y += 0.1
-            multiply(0.2)
-        }
+        bobbingVehicle.velocity = bobbingVehicle.velocity.apply { y = 0.1 }
+    }
+
+    override fun cancel() {
+        _instances.remove(this)
+        super.cancel()
     }
 }
