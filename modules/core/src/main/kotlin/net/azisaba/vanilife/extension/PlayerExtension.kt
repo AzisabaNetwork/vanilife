@@ -4,7 +4,7 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.chapter.Chapter
 import net.azisaba.vanilife.chapter.Objective
 import net.azisaba.vanilife.font.HudFont
-import net.azisaba.vanilife.item.MoneyItemType
+import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.registry.Chapters
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
@@ -73,22 +73,22 @@ var Player.money: Int
         val itemStacks = (openInventory.topInventory.takeIf { it is CraftingInventory }?.run { (openInventory.topInventory as CraftingInventory).matrix } ?: emptyArray<ItemStack?>()) + inventory.contents
 
         val money = itemStacks.filterNotNull()
-            .filter { it.customItemType is MoneyItemType }
-            .sumOf { (it.customItemType as MoneyItemType).price * it.amount }
-        val moneyOnCursor = itemOnCursor.takeIf { it.customItemType is MoneyItemType }
-            ?.run { (itemOnCursor.customItemType as MoneyItemType).price * itemOnCursor.amount } ?: 0
+            .filter { it.customItemType is Money }
+            .sumOf { (it.customItemType as Money).price * it.amount }
+        val moneyOnCursor = itemOnCursor.takeIf { it.customItemType is Money }
+            ?.run { (itemOnCursor.customItemType as Money).price * itemOnCursor.amount } ?: 0
         return money + moneyOnCursor
     }
     set(value) {
         if (money <= value) {
-            give(*MoneyItemType.createItemStacks(value - money).toTypedArray())
+            give(*Money.createItemStacks(value - money).toTypedArray())
             return
         }
 
         val difference = money - value
         var paid = 0
 
-        for ((moneyPrice, moneyType) in MoneyItemType.TYPES) {
+        for ((moneyPrice, moneyType) in Money.TYPES) {
             for (itemStack in inventory.filterNotNull()) {
                 if (itemStack.customItemType != moneyType) {
                     continue

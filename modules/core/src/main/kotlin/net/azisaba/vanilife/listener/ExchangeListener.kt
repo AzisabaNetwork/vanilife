@@ -4,7 +4,7 @@ import net.azisaba.vanilife.extension.createItemStack
 import net.azisaba.vanilife.extension.customItemType
 import net.azisaba.vanilife.extension.matrixSlots
 import net.azisaba.vanilife.extension.resultSlot
-import net.azisaba.vanilife.item.MoneyItemType
+import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.util.runTaskLater
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -54,11 +54,11 @@ object ExchangeListener: Listener {
 
         val inputs = inventory.matrixSlots.filter { inventory.getItem(it) != null }
             .map { it to inventory.getItem(it)!! }
-            .takeIf { it.isNotEmpty() && it.all { entry -> entry.second.customItemType is MoneyItemType && entry.second.isSimilar(it.first().second) } } ?: return
-        val inputType = inputs.first().second.customItemType!! as MoneyItemType
+            .takeIf { it.isNotEmpty() && it.all { entry -> entry.second.customItemType is Money && entry.second.isSimilar(it.first().second) } } ?: return
+        val inputType = inputs.first().second.customItemType!! as Money
 
         val result = inventory.getItem(inventory.resultSlot)
-        val resultType = (result?.customItemType as? MoneyItemType) ?: return
+        val resultType = (result?.customItemType as? Money) ?: return
 
         var amount = if (resultType.maxStackSize < result.amount) resultType.maxStackSize else result.amount
 
@@ -97,7 +97,7 @@ object ExchangeListener: Listener {
             val inventory = info.inventory
             val inputs = inventory.matrixSlots.mapNotNull { inventory.getItem(it) }
 
-            if (inputs.isEmpty() || inputs.any { it.customItemType !is MoneyItemType || !it.isSimilar(inputs.first()) }) {
+            if (inputs.isEmpty() || inputs.any { it.customItemType !is Money || !it.isSimilar(inputs.first()) }) {
                 return@runTaskLater
             }
 
@@ -106,7 +106,7 @@ object ExchangeListener: Listener {
             inventory.clear(inventory.resultSlot)
 
             for (i in amount downTo 0) {
-                val result = (MoneyItemType.EXCHANGE_MAP[inputs.first().clone().apply { this.amount = i }] ?: continue).clone()
+                val result = (Money.EXCHANGE_MAP[inputs.first().clone().apply { this.amount = i }] ?: continue).clone()
                 for (j in 1..(amount / i)) {
                     val resultSlotItem = inventory.getItem(inventory.resultSlot)
                     if (resultSlotItem != null) {
