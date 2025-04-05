@@ -7,3 +7,12 @@ dependencies:
   server:
     kunectron:
       load: AFTER
+permissions:
+  vanilife.*:
+    description: This permission includes all Vanilife permissions.
+    default: op
+    children:
+      vanilife.items: true
+  vanilife.items:
+    description: This permission gives access to the items gui.
+    default: op

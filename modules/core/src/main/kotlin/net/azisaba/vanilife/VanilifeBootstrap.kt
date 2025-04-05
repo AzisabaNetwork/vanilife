@@ -8,12 +8,14 @@ import io.papermc.paper.registry.event.RegistryEvents
 import io.papermc.paper.registry.keys.EnchantmentKeys
 import io.papermc.paper.registry.set.RegistrySet
 import net.azisaba.vanilife.command.GiveCommand
+import net.azisaba.vanilife.command.ItemListCommand
 import net.azisaba.vanilife.registry.CustomEnchantments
 
 class VanilifeBootstrap: PluginBootstrap {
     override fun bootstrap(ctx: BootstrapContext) {
         ctx.lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS) { event ->
             event.registrar().register(GiveCommand.create().build())
+            event.registrar().register(ItemListCommand.create().build(), setOf("il"))
         }
 
         ctx.lifecycleManager.registerEventHandler(RegistryEvents.ENCHANTMENT.freeze().newHandler { event ->

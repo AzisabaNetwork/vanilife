@@ -6,8 +6,10 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.item.Consumable
 import net.azisaba.vanilife.item.CustomItemType
 import net.azisaba.vanilife.item.Food
+import net.azisaba.vanilife.item.Seasonal
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.Registry

@@ -2,11 +2,12 @@ package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.Season
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.registry.ItemGroups
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
-object Sweetfish: Fish, Seasoned {
+object Sweetfish: Fish, Seasonal {
     override val key: Key = Key.key(Vanilife.PLUGIN_ID, "sweetfish")
 
     override val itemType: ItemType = ItemType.STICK
@@ -14,6 +15,8 @@ object Sweetfish: Fish, Seasoned {
     override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "sweetfish")
 
     override val displayName: Component = Component.translatable("item.vanilife.sweetfish")
+
+    override val group: ItemGroup = ItemGroups.FISH
 
     override val nutrition: Int = 2
 

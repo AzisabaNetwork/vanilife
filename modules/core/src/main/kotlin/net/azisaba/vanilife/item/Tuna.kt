@@ -1,6 +1,7 @@
 package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.registry.ItemGroups
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemRarity
@@ -14,6 +15,8 @@ object Tuna: Fish {
     override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "tuna")
 
     override val displayName: Component = Component.translatable("item.vanilife.tuna")
+
+    override val group: ItemGroup = ItemGroups.FISH
 
     override val rarity: ItemRarity = ItemRarity.RARE
 

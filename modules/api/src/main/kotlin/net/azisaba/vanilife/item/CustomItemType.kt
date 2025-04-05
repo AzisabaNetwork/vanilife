@@ -19,6 +19,8 @@ interface CustomItemType: Keyed {
     val lore: List<Component>
         get() = emptyList()
 
+    val group: ItemGroup
+
     val rarity: ItemRarity
         get() = ItemRarity.COMMON
 

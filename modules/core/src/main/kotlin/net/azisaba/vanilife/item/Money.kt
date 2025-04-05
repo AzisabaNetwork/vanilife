@@ -2,6 +2,7 @@ package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.extension.createItemStack
+import net.azisaba.vanilife.registry.ItemGroups
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
@@ -74,6 +75,8 @@ class Money private constructor(override val price: Int): Priced {
 
     override val displayName: Component
         get() = Component.translatable("item.vanilife.money", Component.text(price))
+
+    override val group: ItemGroup = ItemGroups.MONEY
 
     override val maxStackSize: @Range(from = 1, to = 99) Int
         get() = 99
