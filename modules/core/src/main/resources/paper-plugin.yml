@@ -12,7 +12,7 @@ permissions:
     description: This permission includes all Vanilife permissions.
     default: op
     children:
-      vanilife.items: true
-  vanilife.items:
-    description: This permission gives access to the items gui.
+      vanilife.itemlist: true
+  vanilife.itemlist:
+    description: This permission gives access to the item list.
     default: op

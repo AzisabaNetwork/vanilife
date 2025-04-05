@@ -8,6 +8,7 @@ import com.tksimeji.kunectron.event.GuiHandler
 import com.tksimeji.kunectron.hooks.ChestGuiHooks
 import com.tksimeji.kunectron.policy.Policy
 import net.azisaba.vanilife.extension.createItemStack
+import net.azisaba.vanilife.item.CustomItemType
 import net.azisaba.vanilife.item.ItemGroup
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.registry.ItemGroups
@@ -30,8 +31,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
 
     private val groupChunk = CHUNKED_GROUPS.first { it.contains(group) }
 
-    private val customItemTypes = (if (group == ItemGroups.ALL) CustomItemTypes.values else CustomItemTypes.filter { it.group == group })
-        .filter { searchQuery == null || it.key.asString().contains(searchQuery, ignoreCase = true) }
+    private val customItemTypes = search(group, searchQuery)
 
     @ChestGui.Title
     private val title = if (searchQuery == null) {
@@ -104,6 +104,12 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
         Kunectron.create(ItemListGui(player, group, 0, query))
     }
 
+    private fun search(group: ItemGroup, query: String?): List<CustomItemType> {
+        return (if (group == ItemGroups.ALL) CustomItemTypes.values else CustomItemTypes.filter { it.group == group })
+            .filter { searchQuery == null || it.key.asString().contains(searchQuery, ignoreCase = true) }
+            .toList()
+    }
+
     @GuiHandler
     fun onInit(event: ChestGuiEvents.InitEvent) {
         for (index in ITEM_INDEXES) {
@@ -119,7 +125,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
 
             useElement(index2, Element.item(group.icon)
                 .title(group.title.colorIfAbsent(if (group == this.group) NamedTextColor.WHITE else NamedTextColor.GRAY).decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE))
-                .lore(Component.translatable("gui.itemList.tab.description", Component.text(if (group == this.group) customItemTypes.size else CustomItemTypes.count { it.group == group })).color(NamedTextColor.DARK_GRAY))
+                .lore(Component.translatable("gui.itemList.tab.description", Component.text(search(group, searchQuery).size)).color(NamedTextColor.DARK_GRAY))
                 .handler { -> Kunectron.create(ItemListGui(player, group, searchQuery = searchQuery)) })
 
             useElement(index2 + 9, Element.item(if (group == this.group) ItemType.GREEN_STAINED_GLASS_PANE else ItemType.GRAY_STAINED_GLASS_PANE))
