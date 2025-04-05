@@ -6,9 +6,12 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.item.Consumable
 import net.azisaba.vanilife.item.CustomItemType
 import net.azisaba.vanilife.item.Food
+import net.azisaba.vanilife.item.Seasonal
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.attribute.AttributeModifier
@@ -50,6 +53,21 @@ fun CustomItemType.createItemStack(amount: @Range(from = 1, to = 99) Int = 1): I
 
     if (enchantmentAura) {
         itemMeta.addEnchant(Enchantment.INFINITY, 1, false)
+    }
+
+    if (this is Seasonal) {
+        val text = Component.text()
+        for (season in season) {
+            if (text.plainText().isNotEmpty()) {
+                text.append(Component.text(", ").color(NamedTextColor.DARK_GRAY))
+            }
+            text.append(Component.translatable("season.${season.name.lowercase()}").color(season.color))
+        }
+        itemMeta.lore((itemMeta.lore() ?: mutableListOf()).apply {
+            add(Component.translatable("season.seasonal").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
+                .append(Component.text(": ")).color(NamedTextColor.GRAY)
+                .append(text))
+        })
     }
 
     itemStack.setItemMeta(itemMeta)
