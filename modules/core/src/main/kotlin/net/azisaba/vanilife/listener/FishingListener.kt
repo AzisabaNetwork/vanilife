@@ -1,19 +1,25 @@
 package net.azisaba.vanilife.listener
 
 import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.runnable.LavaFishHookRunnable
+import net.azisaba.vanilife.runnable.FishingRodAnimationRunnable
+import net.azisaba.vanilife.runnable.FishingRunnable
+import net.azisaba.vanilife.runnable.FishingRunnable.Companion.runnable
+import net.azisaba.vanilife.util.runTaskLaterAsync
+import org.bukkit.entity.FishHook
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerFishEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemHeldEvent
+import org.bukkit.event.world.WorldLoadEvent
 
 object FishingListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerFish(event: PlayerFishEvent) {
         val player = event.player
         val fishHook = player.fishHook ?: return
-        LavaFishHookRunnable(fishHook).runTaskTimer(Vanilife.plugin, 0, 1)
+        FishingRunnable(fishHook).runTaskTimer(Vanilife.plugin, 0, 1)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -25,7 +31,8 @@ object FishingListener: Listener {
         val player = event.player
         val fishHook = player.fishHook ?: return
 
-        val bobbleVehicle = LavaFishHookRunnable.instances.firstOrNull { it.fishHook == fishHook && it.bobbingVehicle != null }?.bobbingVehicle
+        val runnable = fishHook.runnable()
+        val bobbleVehicle = runnable.bobbingVehicle
 
         if (!fishHook.isInWater && bobbleVehicle == null) {
             return
@@ -36,23 +43,26 @@ object FishingListener: Listener {
         val direction = player.eyeLocation.direction.normalize().apply { y = 0.0 }.normalize()
         val oppositeDirection = direction.multiply(1)
 
-        bobbleVehicle?.velocity = oppositeDirection.multiply(-0.3)
-        fishHook.velocity = oppositeDirection.multiply(-0.3)
+        runnable.entity.velocity = oppositeDirection.multiply(-0.3)
     }
 
-    /* @EventHandler
-    fun onPlayerFish(event: PlayerFishEvent) {
-        val player = event.player
-
-        if (event.state == PlayerFishEvent.State.BITE) {
-            val hook = event.hook
-            event.isCancelled = true
-
-            runTaskTimer(0, 3) {
-                val direction = player.eyeLocation.direction.normalize()
-                val oppositeDirection = direction.multiply(1)
-                hook.velocity = oppositeDirection.multiply(0.2)
+    @EventHandler
+    fun onWorldLoad(event: WorldLoadEvent) {
+        val world = event.world
+        for (entity in world.entities) {
+            if (entity is FishHook && entity.hasMetadata(FishingRunnable.BOBBING_VEHICLE_METADATA)) {
+                entity.remove()
             }
         }
-    } */
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onPlayerItemHeld(event: PlayerItemHeldEvent) {
+        val player = event.player
+        runTaskLaterAsync(10) {
+            if (FishingRodAnimationRunnable.isAnimationNeeded(player) && FishingRodAnimationRunnable.instances.none { it.player == player }) {
+                FishingRodAnimationRunnable(player).runTaskTimerAsynchronously(Vanilife.plugin, 0, 1)
+            }
+        }
+    }
 }

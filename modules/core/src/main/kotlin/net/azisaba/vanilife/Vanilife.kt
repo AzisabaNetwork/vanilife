@@ -2,8 +2,10 @@ package net.azisaba.vanilife
 
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.decodeFromStream
+import com.github.retrooper.packetevents.PacketEvents
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import net.azisaba.vanilife.adapter.Adapter
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.extension.toNamespacedKey
@@ -69,6 +71,11 @@ class Vanilife : JavaPlugin() {
         }
     }
 
+    override fun onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this))
+        PacketEvents.getAPI()
+    }
+
     override fun onEnable() {
         plugin = this
 
@@ -99,6 +106,8 @@ class Vanilife : JavaPlugin() {
             Bukkit.addRecipe(recipe)
         }
 
+        PacketEvents.getAPI().init()
+
         val creator = WorldCreator(Key.key(PLUGIN_ID, "overworld").toNamespacedKey())
             .generator(SimpleChunkGenerator(adapter.createBiomeProvider(ParameterList.OVERWORLD, CustomBiomes.SALT_LAKE)))
         creator.createWorld()
@@ -106,5 +115,6 @@ class Vanilife : JavaPlugin() {
 
     override fun onDisable() {
         dataSource.close()
+        PacketEvents.getAPI().terminate()
     }
 }
