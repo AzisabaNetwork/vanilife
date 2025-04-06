@@ -95,7 +95,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
     @ChestGui.Element(index = [53])
     private val next = Element.item(ItemType.ARROW)
         .title(Component.translatable("gui.nextPage").color(NamedTextColor.GREEN))
-        .handler { -> Kunectron.create(ItemListGui(player, group, min(page + 1, (customItemTypes.size / ITEM_INDEXES.size) - 1))) }
+        .handler { -> Kunectron.create(ItemListGui(player, group, min(page + 1, ((customItemTypes.size + ITEM_INDEXES.size - 1) / ITEM_INDEXES.size) - 1))) }
 
     @ChestGui.PlayerDefaultPolicy
     private val playerDefaultPolicy = Policy.itemSlot(true)
