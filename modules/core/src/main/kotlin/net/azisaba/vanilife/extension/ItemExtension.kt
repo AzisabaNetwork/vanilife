@@ -3,6 +3,7 @@ package net.azisaba.vanilife.extension
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.enchantment.CustomEnchantment
 import net.azisaba.vanilife.item.Consumable
 import net.azisaba.vanilife.item.CustomItemType
 import net.azisaba.vanilife.item.Food
@@ -99,8 +100,8 @@ val ItemStack.customItemType: CustomItemType?
         return CustomItemTypes.get(key)
     }
 
-fun ItemStack.getEnchantmentLevel(enchantment: Enchantment): Int {
-    return enchantments.entries.firstOrNull { it.key.key == enchantment.key }?.value ?: -1
+fun ItemStack.getEnchantmentLevel(enchantment: CustomEnchantment): Int {
+    return enchantments.entries.firstOrNull { it.key.key == enchantment.key }?.value ?: 0
 }
 
 fun ItemStack.hasCustomItemType(): Boolean {

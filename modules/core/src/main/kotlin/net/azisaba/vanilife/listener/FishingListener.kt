@@ -1,10 +1,13 @@
 package net.azisaba.vanilife.listener
 
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.extension.distance2D
+import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.FishingRodAnimationRunnable
 import net.azisaba.vanilife.runnable.FishingRunnable
 import net.azisaba.vanilife.runnable.FishingRunnable.Companion.runnable
 import net.azisaba.vanilife.util.runTaskLaterAsync
+import org.bukkit.Sound
 import org.bukkit.entity.FishHook
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -19,7 +22,10 @@ object FishingListener: Listener {
     fun onPlayerFish(event: PlayerFishEvent) {
         val player = event.player
         val fishHook = player.fishHook ?: return
-        FishingRunnable(fishHook).runTaskTimer(Vanilife.plugin, 0, 1)
+
+        if (event.state == PlayerFishEvent.State.FISHING) {
+            FishingRunnable(player, fishHook).runTaskTimer(Vanilife.plugin, 0, 1)
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -43,7 +49,13 @@ object FishingListener: Listener {
         val direction = player.eyeLocation.direction.normalize().apply { y = 0.0 }.normalize()
         val oppositeDirection = direction.multiply(1)
 
-        runnable.entity.velocity = oppositeDirection.multiply(-0.3)
+        val hookLike = runnable.entity
+        hookLike.velocity = oppositeDirection.multiply(-0.3)
+        if (hookLike.location.distance2D(player.location) < 3 && runnable.fish != null) {
+            runnable.caught()
+        }
+
+        FishingHudRunnable.click(player)
     }
 
     @EventHandler

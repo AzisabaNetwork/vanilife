@@ -3,10 +3,11 @@ package net.azisaba.vanilife.runnable
 import net.azisaba.vanilife.extension.distance2D
 import net.azisaba.vanilife.extension.sendFishingHud
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import java.util.*
 
 object FishingHudRunnable: Runnable {
-    internal val clickTimes = mutableMapOf<UUID, MutableList<Long>>()
+    private val clickTimes = mutableMapOf<UUID, MutableList<Long>>()
 
     override fun run() {
         for (player in Bukkit.getOnlinePlayers()) {
@@ -24,5 +25,9 @@ object FishingHudRunnable: Runnable {
 
             player.sendFishingHud(hookLocation.distance2D(playerLocation), timestamps.size)
         }
+    }
+
+    fun click(player: Player) {
+        clickTimes.getOrPut(player.uniqueId) { mutableListOf() }.add(System.currentTimeMillis())
     }
 }
