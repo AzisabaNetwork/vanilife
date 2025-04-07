@@ -125,7 +125,7 @@ fun Player.sendHud(level: ComponentLike, levelIcon: Char = HudFont.levelIcon(sco
         .append(Component.text(money.plainText().padEnd(10, HudFont.SPACE6)).style(money.asComponent().style()).shadowColorIfAbsent(ShadowColor.shadowColor(48, 23, 2, 255)))))
 }
 
-fun Player.sendFishingHud(hook: Int, reel: Float) {
+fun Player.sendFishingHud(distance: Double, cps: Int) {
     if (remainingAir < maximumAir) {
         sendActionBar(Component.empty())
         return
@@ -133,8 +133,8 @@ fun Player.sendFishingHud(hook: Int, reel: Float) {
 
     sendActionBar(Component.text("${HudFont.SPACE124}").font(HudFont)
         .append(Component.text(HudFont.FISHING_HOOK))
-        .append(Component.text("${hook.toString().padStart(2, '0')}M"))
+        .append(Component.text("${String.format("%.2f", distance).padStart(5, '0')}M"))
         .append(Component.text(HudFont.SPACE6))
         .append(Component.text(HudFont.FISHING_REEL))
-        .append(Component.text(String.format("%.2f", reel).padEnd(2, '0'))))
+        .append(Component.text(cps.toString().padStart(2, '0'))))
 }
