@@ -1,8 +1,7 @@
 package net.azisaba.vanilife.adapter
 
 import com.mojang.datafixers.util.Pair
-import net.azisaba.vanilife.extension.frozen
-import net.azisaba.vanilife.extension.minecraft
+import net.azisaba.vanilife.extension.*
 import net.azisaba.vanilife.util.getMappedRegistry
 import net.azisaba.vanilife.util.getRegistry
 import net.azisaba.vanilife.world.biome.CustomBiome
@@ -25,10 +24,10 @@ abstract class V1_21_x: Adapter {
     private val randomStates = mutableMapOf<WorldInfo, RandomState>()
 
     override fun registerCustomBiome(customBiome: CustomBiome) {
-        val biomeRegistry = getMappedRegistry(Registries.BIOME).apply { frozen(false) }
+        val biomeRegistry = getMappedRegistry(Registries.BIOME).apply { unfrozenSilently() }
 
-        val biome = customBiome.minecraft()
-        val holder = biomeRegistry.register(ResourceKey.create(Registries.BIOME, customBiome.key.minecraft()), biome, RegistrationInfo.BUILT_IN)
+        val biome = customBiome.toMinecraftBiome()
+        val holder = biomeRegistry.register(ResourceKey.create(Registries.BIOME, customBiome.key.toMinecraftResourceLocation()), biome, RegistrationInfo.BUILT_IN)
 
         val bindValueMethod = Holder.Reference::class.java.getDeclaredMethod("bindValue", Any::class.java).apply { isAccessible = true }
         bindValueMethod.invoke(holder, biome)
@@ -36,12 +35,12 @@ abstract class V1_21_x: Adapter {
         val bindTagsMethod = Holder.Reference::class.java.getDeclaredMethod("bindTags", Collection::class.java).apply { isAccessible = true }
         bindTagsMethod.invoke(holder, emptySet<TagKey<Biome>>())
 
-        biomeRegistry.frozen(true)
+        biomeRegistry.frozenSilently()
     }
 
     override fun createBiomeProvider(parameterList: ParameterList, vararg customBiomes: CustomBiome): BiomeProvider {
         val parameterListRegistry = getRegistry(Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST)
-        val parameterListKey = ResourceKey.create(Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, parameterList.key.minecraft())
+        val parameterListKey = ResourceKey.create(Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, parameterList.key.toMinecraftResourceLocation())
         val parameterListHolder = parameterListRegistry.getOrThrow(parameterListKey)
 
         val parameters = parameterListHolder.value().parameters().values().toMutableList()
@@ -49,10 +48,10 @@ abstract class V1_21_x: Adapter {
         for (customBiome in customBiomes) {
             val climate = customBiome.climate ?: continue
 
-            parameters.add(Pair.of(climate.minecraft(), CraftBiome.bukkitToMinecraftHolder(customBiome.toPaperBiome())))
+            parameters.add(Pair.of(climate.toMinecraftParameterPoint(), CraftBiome.bukkitToMinecraftHolder(customBiome.toPaperBiome())))
         }
 
-        val generator = parameterList.minecraft().generator as NoiseBasedChunkGenerator
+        val generator = parameterList.toMinecraftLevelStem().generator as NoiseBasedChunkGenerator
         val biomeSource = MultiNoiseBiomeSource.createFromList(Climate.ParameterList(parameters))
 
         return object : BiomeProvider() {

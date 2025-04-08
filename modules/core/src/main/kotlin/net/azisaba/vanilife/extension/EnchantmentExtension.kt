@@ -24,6 +24,6 @@ fun Enchantment.createEnchantedBook(amount: Int = 1, level: Int = 1): ItemStack 
     return enchantedBook.apply { itemMeta = meta }
 }
 
-fun CustomEnchantment.paperEnchantment(): Enchantment {
+fun CustomEnchantment.toPaperEnchantment(): Enchantment {
     return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(key)!!
 }

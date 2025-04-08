@@ -1,7 +1,7 @@
 package net.azisaba.vanilife.runnable
 
+import net.azisaba.vanilife.extension.lv
 import net.azisaba.vanilife.extension.money
-import net.azisaba.vanilife.extension.scoreLevel
 import net.azisaba.vanilife.extension.sendHud
 import net.azisaba.vanilife.font.HudFont
 import net.kyori.adventure.text.Component
@@ -31,7 +31,7 @@ object HudRunnable: Runnable {
                 continue
             }
 
-            val level = player.scoreLevel
+            val level = player.lv
             val money = player.money
 
             val uuid = player.uniqueId

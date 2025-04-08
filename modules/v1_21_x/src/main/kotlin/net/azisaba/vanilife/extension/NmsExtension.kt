@@ -1,10 +1,12 @@
 package net.azisaba.vanilife.extension
 
-import net.azisaba.vanilife.world.biome.CustomBiome
-import net.azisaba.vanilife.world.biome.ParameterList
+import io.papermc.paper.adventure.PaperAdventure
 import net.azisaba.vanilife.entity.MobCategory
 import net.azisaba.vanilife.util.getRegistry
+import net.azisaba.vanilife.world.biome.CustomBiome
+import net.azisaba.vanilife.world.biome.ParameterList
 import net.kyori.adventure.key.Keyed
+import net.kyori.adventure.text.Component
 import net.minecraft.core.MappedRegistry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
@@ -12,27 +14,33 @@ import net.minecraft.world.level.biome.*
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData
 import net.minecraft.world.level.dimension.LevelStem
 import org.bukkit.craftbukkit.entity.CraftEntityType
+import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.entity.EntityType
+import org.bukkit.inventory.ItemStack
 
-fun CustomBiome.minecraft(): Biome {
+fun Component.toMinecraftComponent(): net.minecraft.network.chat.Component {
+    return PaperAdventure.asVanilla(this)
+}
+
+fun CustomBiome.toMinecraftBiome(): Biome {
     val mobSpawnSettings = MobSpawnSettings.Builder().apply {
         for (spawner in spawners) {
-            addSpawn(spawner.mobCategory.minecraft(), SpawnerData(spawner.entityType.minecraft(), spawner.weight, spawner.count.min, spawner.count.max))
+            addSpawn(spawner.mobCategory.toMinecraftMobCategory(), SpawnerData(spawner.entityType.toMinecraftEntityType(), spawner.weight, spawner.count.min, spawner.count.max))
         }
     }.build()
 
     return Biome.BiomeBuilder()
         .hasPrecipitation(hasPrecipitation)
         .temperature(temperature)
-        .temperatureAdjustment(temperatureModifier.minecraft())
+        .temperatureAdjustment(temperatureModifier.toMinecraftTemperatureModifier())
         .downfall(downfall)
-        .specialEffects(effects.minecraft())
+        .specialEffects(effects.toMinecraftBiomeSpecialEffect())
         .mobSpawnSettings(mobSpawnSettings)
         .generationSettings(BiomeGenerationSettings.EMPTY)
         .build()
 }
 
-fun CustomBiome.Climate.minecraft(): Climate.ParameterPoint {
+fun CustomBiome.Climate.toMinecraftParameterPoint(): Climate.ParameterPoint {
     return Climate.ParameterPoint(
         Climate.Parameter.span(temperature.min, temperature.max),
         Climate.Parameter.span(humidity.min, humidity.max),
@@ -44,7 +52,7 @@ fun CustomBiome.Climate.minecraft(): Climate.ParameterPoint {
     )
 }
 
-fun CustomBiome.Effects.minecraft(): BiomeSpecialEffects {
+fun CustomBiome.Effects.toMinecraftBiomeSpecialEffect(): BiomeSpecialEffects {
     return BiomeSpecialEffects.Builder()
         .fogColor(fogColor.toInt())
         .waterColor(waterColor.toInt())
@@ -54,31 +62,40 @@ fun CustomBiome.Effects.minecraft(): BiomeSpecialEffects {
         .build()
 }
 
-fun CustomBiome.Spawner.minecraft(): SpawnerData {
-    return SpawnerData(entityType.minecraft(), weight, count.min, count.max)
+fun CustomBiome.Spawner.toMinecraftSpawnerData(): SpawnerData {
+    return SpawnerData(entityType.toMinecraftEntityType(), weight, count.min, count.max)
 }
 
-fun CustomBiome.TemperatureModifier.minecraft(): Biome.TemperatureModifier {
+fun CustomBiome.TemperatureModifier.toMinecraftTemperatureModifier(): Biome.TemperatureModifier {
     return when (this) {
         CustomBiome.TemperatureModifier.NONE -> Biome.TemperatureModifier.NONE
         CustomBiome.TemperatureModifier.FROZEN -> Biome.TemperatureModifier.FROZEN
     }
 }
 
-fun EntityType.minecraft(): net.minecraft.world.entity.EntityType<*> {
+fun EntityType.toMinecraftEntityType(): net.minecraft.world.entity.EntityType<*> {
     return CraftEntityType.bukkitToMinecraft(this)
 }
 
-fun Keyed.minecraft(): ResourceLocation {
+fun ItemStack.toMinecraftItemStack(): net.minecraft.world.item.ItemStack {
+    return CraftItemStack.asNMSCopy(this)
+}
+
+fun Keyed.toMinecraftResourceLocation(): ResourceLocation {
     return ResourceLocation.fromNamespaceAndPath(key().namespace(), key().value())
 }
 
-fun MappedRegistry<*>.frozen(frozen: Boolean) {
+fun MappedRegistry<*>.frozenSilently() {
     val frozenField = javaClass.getDeclaredField("frozen").apply { isAccessible = true }
-    frozenField.set(this, frozen)
+    frozenField.set(this, true)
 }
 
-fun MobCategory.minecraft(): net.minecraft.world.entity.MobCategory {
+fun MappedRegistry<*>.unfrozenSilently() {
+    val frozenField = javaClass.getDeclaredField("frozen").apply { isAccessible = true }
+    frozenField.set(this, false)
+}
+
+fun MobCategory.toMinecraftMobCategory(): net.minecraft.world.entity.MobCategory {
     return when (this) {
         MobCategory.MONSTER -> net.minecraft.world.entity.MobCategory.MONSTER
         MobCategory.CREATURE -> net.minecraft.world.entity.MobCategory.CREATURE
@@ -91,7 +108,7 @@ fun MobCategory.minecraft(): net.minecraft.world.entity.MobCategory {
     }
 }
 
-fun ParameterList.minecraft(): LevelStem {
+fun ParameterList.toMinecraftLevelStem(): LevelStem {
     val levelStemRegistry = getRegistry(Registries.LEVEL_STEM)
     return when (this) {
         ParameterList.OVERWORLD -> levelStemRegistry.getValueOrThrow(LevelStem.OVERWORLD)

@@ -2,7 +2,7 @@ package net.azisaba.vanilife.listener
 
 import net.azisaba.vanilife.enchantment.ToolEnchantment
 import net.azisaba.vanilife.extension.customEnchantment
-import net.azisaba.vanilife.extension.paperEnchantment
+import net.azisaba.vanilife.extension.toPaperEnchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -27,7 +27,7 @@ object CustomEnchantmentListener: Listener {
         val blocks = mutableSetOf(event.block)
 
         for (customEnchantment in customEnchantments) {
-            customEnchantment.use(player, blocks, itemStack, customEnchantment.paperEnchantment())
+            customEnchantment.use(player, blocks, itemStack, customEnchantment.toPaperEnchantment())
         }
 
         for (block in blocks) {
