@@ -4,9 +4,8 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.registry.Registry
 import net.kyori.adventure.key.Key
 
-object HudFont: Font, Registry<String, Char>() {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "hud")
+object HudFont: Registry<String, Char>(), Font {
+    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "hud")
 
     val LEVEL_BLUE = register("level_blue", '\uE001')
     

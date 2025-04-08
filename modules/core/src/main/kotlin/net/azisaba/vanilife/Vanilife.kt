@@ -82,7 +82,7 @@ class Vanilife : JavaPlugin() {
         saveDefaultConfig()
         reloadPluginConfig()
 
-        createTableIfNotExists(DATABASE_PLAYER, ":uuid VARCHAR(36) NOT NULL PRIMARY KEY, score SMALLINT UNSIGNED NOT NULL")
+        createTableIfNotExists(DATABASE_PLAYER, ":uuid VARCHAR(36) NOT NULL PRIMARY KEY, level SMALLINT UNSIGNED NOT NULL")
         createTableIfNotExists(DATABASE_PLAYER_CHAPTER, ":player VARCHAR(36) NOT NULL, chapter VARCHAR(256) NOT NULL, PRIMARY KEY (player, chapter)")
         createTableIfNotExists(DATABASE_PLAYER_OBJECTIVE, ":player VARCHAR(36) NOT NULL, objective VARCHAR(256) NOT NULL, PRIMARY KEY (player, objective)")
 

@@ -16,21 +16,23 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
-private val SCORE_CACHE = mutableMapOf<UUID, Int>()
+private val DATABASE_CACHE_LEVEL = mutableMapOf<UUID, Int>()
+private val DATABASE_CACHE_CHAPTER = mutableMapOf<Pair<UUID, Chapter>, Boolean>()
+private val DATABASE_CACHE_OBJECTIVE = mutableMapOf<Pair<UUID, Objective>, Boolean>()
 
-var OfflinePlayer.score: Int
+var OfflinePlayer.lv: Int
     get() {
-        if (SCORE_CACHE.containsKey(uniqueId)) {
-            return SCORE_CACHE[uniqueId]!!
+        if (DATABASE_CACHE_LEVEL.containsKey(uniqueId)) {
+            return DATABASE_CACHE_LEVEL[uniqueId]!!
         }
 
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("SELECT score FROM ${Vanilife.DATABASE_PLAYER} WHERE uuid = ?").use { preparedStatement ->
+            connection.prepareStatement("SELECT level FROM ${Vanilife.DATABASE_PLAYER} WHERE uuid = ?").use { preparedStatement ->
                 preparedStatement.setString(1, uniqueId.toString())
                 preparedStatement.executeQuery().use { resultSet ->
                     if (resultSet.next()) {
                         return resultSet.getInt("score").also {
-                            SCORE_CACHE[uniqueId] = it
+                            DATABASE_CACHE_LEVEL[uniqueId] = it
                         }
                     }
                 }
@@ -38,15 +40,15 @@ var OfflinePlayer.score: Int
 
             connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER} VALUES (?, ?)").use { preparedStatement ->
                 preparedStatement.setString(1, uniqueId.toString())
-                preparedStatement.setInt(2, 0)
+                preparedStatement.setInt(2, 1)
                 preparedStatement.executeUpdate()
-                SCORE_CACHE[uniqueId] = 0
+                DATABASE_CACHE_LEVEL[uniqueId] = 1
                 return 0
             }
         }
     }
     set(value) {
-        if (value == score || value < 0 || value > maximumScore) {
+        if (value == lv || value < 0 || value > 99) {
             return
         }
 
@@ -59,14 +61,8 @@ var OfflinePlayer.score: Int
             }
         }
 
-        SCORE_CACHE[uniqueId] = value
+        DATABASE_CACHE_LEVEL[uniqueId] = value
     }
-
-val OfflinePlayer.scoreLevel: Int
-    get() = score / 100
-
-val OfflinePlayer.maximumScore: Int
-    get() = 99 * 100
 
 var Player.money: Int
     get() {
@@ -107,12 +103,9 @@ var Player.money: Int
     }
 
 val OfflinePlayer.chapters: Set<Chapter>
-    get() = Chapters.values.filter { it.isGranted(this) }.toSet()
+    get() = Chapters.filter { hasChapter(it) }.toSet()
 
-val Player.objectives: Set<Objective>
-    get() = chapters.flatMap { it.objectives.filter { objective -> objective.isAchieved(this) } }.toSet()
-
-fun Player.sendHud(level: ComponentLike, levelIcon: Char = HudFont.levelIcon(scoreLevel), money: ComponentLike, moneyIcon: Char = HudFont.MONEY) {
+fun Player.sendHud(level: ComponentLike, levelIcon: Char = HudFont.levelIcon(lv), money: ComponentLike, moneyIcon: Char = HudFont.MONEY) {
     if (remainingAir < maximumAir) {
         sendActionBar(Component.empty())
         return
@@ -137,4 +130,118 @@ fun Player.sendFishingHud(distance: Double, cps: Int) {
         .append(Component.text(HudFont.SPACE6))
         .append(Component.text(HudFont.FISHING_REEL))
         .append(Component.text(cps.toString().padStart(2, '0'))))
+}
+
+fun OfflinePlayer.grantChapter(chapter: Chapter) {
+    val cacheKey = Pair(uniqueId, chapter)
+
+    if (DATABASE_CACHE_CHAPTER[cacheKey] == true || hasChapter(chapter)) {
+        return
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER_CHAPTER} VALUES (?, ?)").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, chapter.key.asString())
+            preparedStatement.executeUpdate()
+        }
+    }
+
+    DATABASE_CACHE_CHAPTER[cacheKey] = true
+}
+
+fun OfflinePlayer.revokeChapter(chapter: Chapter) {
+    val cacheKey = Pair(uniqueId, chapter)
+
+    if (DATABASE_CACHE_CHAPTER[cacheKey] == false || !hasChapter(chapter)) {
+        return
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("DELETE FROM ${Vanilife.DATABASE_PLAYER_CHAPTER} WHERE player = ? AND chapter = ?").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, chapter.key.asString())
+            preparedStatement.executeUpdate()
+        }
+    }
+
+    DATABASE_CACHE_CHAPTER[cacheKey] = false
+}
+
+fun OfflinePlayer.hasChapter(chapter: Chapter): Boolean {
+    val cacheKey = Pair(uniqueId, chapter)
+    val cache = DATABASE_CACHE_CHAPTER[cacheKey]
+
+    if (cache != null) {
+        return cache
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("SELECT 1 FROM ${Vanilife.DATABASE_PLAYER_CHAPTER} WHERE player = ? AND chapter = ?").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, chapter.key.asString())
+            preparedStatement.executeQuery().use { resultSet ->
+                val exists = resultSet.next()
+                DATABASE_CACHE_CHAPTER[cacheKey] = exists
+                return exists
+            }
+        }
+    }
+}
+
+fun OfflinePlayer.grantObjective(objective: Objective) {
+    val cacheKey = Pair(uniqueId, objective)
+
+    if (DATABASE_CACHE_OBJECTIVE[cacheKey] == true || hasObjective(objective)) {
+        return
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER_OBJECTIVE} VALUES (?, ?)").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, objective.key.asString())
+            preparedStatement.executeUpdate()
+        }
+    }
+
+    DATABASE_CACHE_OBJECTIVE[cacheKey] = true
+}
+
+fun OfflinePlayer.revokeObjective(objective: Objective) {
+    val cacheKey = Pair(uniqueId, objective)
+
+    if (DATABASE_CACHE_OBJECTIVE[cacheKey] == false || !hasObjective(objective)) {
+        return
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("DELETE FROM ${Vanilife.DATABASE_PLAYER_OBJECTIVE} WHERE player = ? AND objective = ?").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, objective.key.asString())
+            preparedStatement.executeUpdate()
+        }
+    }
+
+    DATABASE_CACHE_OBJECTIVE[cacheKey] = false
+}
+
+fun OfflinePlayer.hasObjective(objective: Objective): Boolean {
+    val cacheKey = Pair(uniqueId, objective)
+    val cache = DATABASE_CACHE_OBJECTIVE[cacheKey]
+
+    if (cache != null) {
+        return cache
+    }
+
+    Vanilife.dataSource.connection.use { connection ->
+        connection.prepareStatement("SELECT 1 FROM ${Vanilife.DATABASE_PLAYER_OBJECTIVE} WHERE player = ? AND objective = ?").use { preparedStatement ->
+            preparedStatement.setString(1, uniqueId.toString())
+            preparedStatement.setString(2, objective.key.asString())
+            preparedStatement.executeQuery().use { resultSet ->
+                val exists = resultSet.next()
+                DATABASE_CACHE_OBJECTIVE[cacheKey] = exists
+                return exists
+            }
+        }
+    }
 }
