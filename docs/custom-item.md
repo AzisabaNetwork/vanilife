@@ -12,10 +12,10 @@
 
 `Consumable`, `Fish`, `Food`, `Fruit`, `Priced`, `Seasonal`, `Vegetable`
 
-> ![NOTE]
+> [!NOTE]
 > カスタムアイテムタイプの定義クラスは `core` モジュールの `net.azisaba.vanilife.item` パッケージに格納します。
 
-> ![CAUTION]
+> [!CAUTION]
 > 定義オブジェクト内のプロパティで他のカスタムアイテムタイプの定義オブジェクトを参照しないでください。
 
 ```kotlin
@@ -69,7 +69,7 @@ object AppleJam: CustomItemType {
 
 `net.azisaba.vanilife.registry.CustomItemTypes` レジストリに定義オブジェクトを登録します。
 
-> ![NOTE]
+> [!NOTE]
 > レジストリ内のプロパティはアルファベット順に並べてください
 
 ```kotlin
@@ -83,7 +83,7 @@ object CustomItemTypes: KeyedRegistry<CustomItemType>() {
 
 カスタムアイテムタイプを実際に ItemStack としてアイテム化しましょう。
 
-> ![TIP]
+> [!TIP]
 > `createItemStack` メソッドの引数に個数を渡すことも可能です。
 > これはオプションで、指定しない場合には1が使用されます。
 
@@ -98,7 +98,7 @@ val itemStack = CustomItemTypes.APPLE_JAM.createItemStack()
 
 カスタムアイテムかを確認するには、`hasCustomItemType()` を呼び出します。
 
-> ![TIP]
+> [!TIP]
 > これらのプロパティ・メソッドは `net.azisaba.vanilife.extension.ItemExtension` から
 > 拡張プロパティ・メソッドとして提供されます。
 
