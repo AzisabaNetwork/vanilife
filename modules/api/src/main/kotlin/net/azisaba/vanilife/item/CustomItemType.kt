@@ -3,7 +3,10 @@ package net.azisaba.vanilife.item
 import net.azisaba.vanilife.registry.Keyed
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemType
 import org.jetbrains.annotations.Range
@@ -39,6 +42,6 @@ interface CustomItemType: Keyed {
     fun onInOffHand(player: Player) {
     }
 
-    fun use(player: Player) {
+    fun use(player: Player, action: Action, block: Block?, blockFace: BlockFace) {
     }
 }

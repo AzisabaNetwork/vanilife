@@ -1,4 +1,4 @@
-package net.azisaba.vanilife.adapter
+package net.azisaba.vanilife
 
 import com.mojang.datafixers.util.Pair
 import net.azisaba.vanilife.extension.*

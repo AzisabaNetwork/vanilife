@@ -1,4 +1,4 @@
-package net.azisaba.vanilife.adapter
+package net.azisaba.vanilife
 
 import net.azisaba.vanilife.world.biome.CustomBiome
 import net.azisaba.vanilife.world.biome.ParameterList
