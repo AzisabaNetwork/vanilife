@@ -6,7 +6,6 @@ import com.github.retrooper.packetevents.PacketEvents
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
-import net.azisaba.vanilife.adapter.Adapter
 import net.azisaba.vanilife.data.Config
 import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.listener.*

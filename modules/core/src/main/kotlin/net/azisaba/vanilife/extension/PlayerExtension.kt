@@ -4,16 +4,23 @@ import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.chapter.Chapter
 import net.azisaba.vanilife.chapter.Objective
 import net.azisaba.vanilife.font.HudFont
+import net.azisaba.vanilife.font.DialogueFirstLineFont
+import net.azisaba.vanilife.font.DialogueSecondLineFont
+import net.azisaba.vanilife.font.TitleFont
 import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.registry.Chapters
+import net.azisaba.vanilife.util.runTaskTimerAsync
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.title.Title
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
+import java.time.Duration
 import java.util.*
 
 private val DATABASE_CACHE_LEVEL = mutableMapOf<UUID, Int>()
@@ -31,7 +38,7 @@ var OfflinePlayer.lv: Int
                 preparedStatement.setString(1, uniqueId.toString())
                 preparedStatement.executeQuery().use { resultSet ->
                     if (resultSet.next()) {
-                        return resultSet.getInt("score").also {
+                        return resultSet.getInt("level").also {
                             DATABASE_CACHE_LEVEL[uniqueId] = it
                         }
                     }
@@ -53,7 +60,7 @@ var OfflinePlayer.lv: Int
         }
 
         Vanilife.dataSource.connection.use { connection ->
-            connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER} (uuid, score) VALUES (?, ?) ON DUPLICATE KEY UPDATE score = ?").use { preparedStatement ->
+            connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER} (uuid, level) VALUES (?, ?) ON DUPLICATE KEY UPDATE level = ?").use { preparedStatement ->
                 preparedStatement.setString(1, uniqueId.toString())
                 preparedStatement.setInt(2, value)
                 preparedStatement.setInt(3, value)
@@ -132,6 +139,36 @@ fun Player.sendFishingHud(distance: Double, cps: Int) {
         .append(Component.text(cps.toString().padStart(2, '0'))))
 }
 
+fun Player.showDialogue(firstLine: String, secondLine: String, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4) {
+    fun build(string: String): String {
+        val width = string.sumOf { if (it.code in 0x00..0x7F) 2 else 4.toInt() }
+        val remaining = 4 * 32 - width
+        return if (remaining <= 0) {
+            string
+        } else {
+            string + space4.toString().repeat(remaining / 4) + if (remaining % 4 == 2) space2 else ""
+        }
+    }
+
+    var x = 0
+    var y = 0
+    runTaskTimerAsync(0, 2) {
+        val title = Component.text(TitleFont.DIALOGUE).font(TitleFont).shadowColor(ShadowColor.none())
+        val subtitle = Component.text().color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
+            .append(Component.text(build(if (y == 0) firstLine.substring(0, x) else firstLine)).font(DialogueFirstLineFont))
+            .append(Component.text(build(if (y == 1) secondLine.substring(0, x) else "")).font(DialogueSecondLineFont))
+            .build()
+
+        showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)))
+
+        if ((if (y == 0) firstLine.length else secondLine.length) <= x++) {
+            x = 0
+            return@runTaskTimerAsync ++y < 2
+        }
+        return@runTaskTimerAsync true
+    }
+}
+
 fun OfflinePlayer.grantChapter(chapter: Chapter) {
     val cacheKey = Pair(uniqueId, chapter)
 
@@ -205,6 +242,14 @@ fun OfflinePlayer.grantObjective(objective: Objective) {
     }
 
     DATABASE_CACHE_OBJECTIVE[cacheKey] = true
+
+    if (this is Player) {
+        objective.onAchieve(this)
+        val chapter = objective.chapter
+        if (chapter.all { hasObjective(it) }) {
+            chapter.onAchieve(this)
+        }
+    }
 }
 
 fun OfflinePlayer.revokeObjective(objective: Objective) {

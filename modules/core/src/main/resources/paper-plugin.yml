@@ -14,7 +14,11 @@ permissions:
     description: This permission includes all Vanilife permissions.
     default: op
     children:
-      vanilife.itemlist: true
-  vanilife.itemlist:
-    description: This permission gives access to the item list.
+      vanilife.commands.dialogue: true
+      vanilife.commands.itemlist: true
+  vanilife.commands.dialogue:
+    description: This permission gives access to dialogue command.
+    default: op
+  vanilife.commands.itemlist:
+    description: This permission gives access to itemlist command.
     default: op

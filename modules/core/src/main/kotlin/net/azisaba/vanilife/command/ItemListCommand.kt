@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 object ItemListCommand: CommandCreator {
     override fun create(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("itemlist")
-            .requires { it.sender.hasPermission("vanilife.items") && it.sender is Player }
+            .requires { it.sender.hasPermission("vanilife.commands.items") && it.sender is Player }
             .executes { ctx ->
                 Kunectron.create(ItemListGui(ctx.source.sender as Player))
                 Command.SINGLE_SUCCESS
