@@ -37,4 +37,8 @@ abstract class Registry<K, V>: IRegistry<K, V> {
     override fun iterator(): Iterator<V> {
         return values.iterator()
     }
+
+    override fun toMap(): Map<K, V> {
+        return entries.toMap()
+    }
 }

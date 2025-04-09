@@ -39,7 +39,7 @@ object DialogueCommand: CommandCreator {
         }
 
         for (target in targets) {
-            target.showDialogue(firstLine, secondLine)
+            target.showDialogue(Component.text(firstLine), Component.text(secondLine))
         }
 
         if (targets.size > 1) {

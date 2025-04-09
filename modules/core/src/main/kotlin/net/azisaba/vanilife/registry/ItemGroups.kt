@@ -18,6 +18,8 @@ object ItemGroups: KeyedRegistry<ItemGroup>() {
 
     val MONEY = register(MoneyGroup)
 
+    val RECIPE = register(RecipeGroup)
+
     val TOOL = register(ToolGroup)
 
     val VEGETABLE = register(VegetableGroup)

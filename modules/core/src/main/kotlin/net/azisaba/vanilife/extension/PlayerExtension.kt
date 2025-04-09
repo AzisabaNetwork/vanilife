@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
+import net.kyori.adventure.translation.GlobalTranslator
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
@@ -139,7 +140,32 @@ fun Player.sendFishingHud(distance: Double, cps: Int) {
         .append(Component.text(cps.toString().padStart(2, '0'))))
 }
 
-fun Player.showDialogue(firstLine: String, secondLine: String, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4) {
+fun Player.showDialogue(component: Component) {
+    val string = GlobalTranslator.render(component, locale()).plainText()
+
+    if (string.length <= 36) {
+        showDialogue(component, Component.empty())
+        return
+    }
+
+    val separators = setOf('.', ',', '。', '、')
+
+    val substring = string.substring(0, 36)
+    var splitIndex = -1
+
+    for (i in substring.length - 1 downTo  0) {
+        if (substring[i] in separators) {
+            splitIndex = i
+            break
+        }
+    }
+
+    val firstLine = Component.text(if (splitIndex != -1) string.substring(0, splitIndex + 1) else string.substring(0, 36))
+    val secondLine = Component.text(if (splitIndex != -1) string.substring(splitIndex + 1)  else string.substring(36))
+    showDialogue(firstLine, secondLine)
+}
+
+fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4) {
     fun build(string: String): String {
         val width = string.sumOf { if (it.code in 0x00..0x7F) 2 else 4.toInt() }
         val remaining = 4 * 32 - width
@@ -150,18 +176,21 @@ fun Player.showDialogue(firstLine: String, secondLine: String, space2: Char = Di
         }
     }
 
+    val firstLineRaw = GlobalTranslator.render(firstLine, locale()).plainText()
+    val secondLineRaw = GlobalTranslator.render(secondLine, locale()).plainText()
+
     var x = 0
     var y = 0
     runTaskTimerAsync(0, 2) {
         val title = Component.text(TitleFont.DIALOGUE).font(TitleFont).shadowColor(ShadowColor.none())
         val subtitle = Component.text().color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
-            .append(Component.text(build(if (y == 0) firstLine.substring(0, x) else firstLine)).font(DialogueFirstLineFont))
-            .append(Component.text(build(if (y == 1) secondLine.substring(0, x) else "")).font(DialogueSecondLineFont))
+            .append(Component.text(build(if (y == 0) firstLineRaw.substring(0, x) else firstLineRaw)).font(DialogueFirstLineFont))
+            .append(Component.text(build(if (y == 1) secondLineRaw.substring(0, x) else "")).font(DialogueSecondLineFont))
             .build()
 
         showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)))
 
-        if ((if (y == 0) firstLine.length else secondLine.length) <= x++) {
+        if ((if (y == 0) firstLineRaw.length else secondLineRaw.length) <= x++) {
             x = 0
             return@runTaskTimerAsync ++y < 2
         }

@@ -14,4 +14,6 @@ interface IRegistry<K, V>: Iterable<V> {
     fun <T: V> register(key: K, value: T): T
 
     fun unregister(key: K): V
+
+    fun toMap(): Map<K, V>
 }

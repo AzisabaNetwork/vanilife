@@ -11,6 +11,7 @@ import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.listener.*
 import net.azisaba.vanilife.registry.CustomBiomes
 import net.azisaba.vanilife.registry.CustomRecipes
+import net.azisaba.vanilife.registry.LanguageBundles
 import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
@@ -19,6 +20,8 @@ import net.azisaba.vanilife.world.SimpleChunkGenerator
 import net.azisaba.vanilife.world.biome.ParameterList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import net.kyori.adventure.translation.GlobalTranslator
+import net.kyori.adventure.translation.TranslationRegistry
 import org.bukkit.Bukkit
 import org.bukkit.WorldCreator
 import org.bukkit.plugin.java.JavaPlugin
@@ -43,6 +46,8 @@ class Vanilife : JavaPlugin() {
 
         val adapter: Adapter
             get() = V1_21_4
+
+        val translationRegistry = TranslationRegistry.create(Key.key(PLUGIN_ID, "translation"))
 
         fun reloadPluginConfig() {
             pluginConfig = Yaml.default.decodeFromStream(File(plugin.dataFolder, "config.yml").inputStream())
@@ -104,6 +109,11 @@ class Vanilife : JavaPlugin() {
         for (recipe in CustomRecipes) {
             Bukkit.addRecipe(recipe)
         }
+
+        for ((locale, bundle) in LanguageBundles.toMap()) {
+            translationRegistry.registerAll(locale, bundle, true)
+        }
+        GlobalTranslator.translator().addSource(translationRegistry)
 
         PacketEvents.getAPI().init()
 
