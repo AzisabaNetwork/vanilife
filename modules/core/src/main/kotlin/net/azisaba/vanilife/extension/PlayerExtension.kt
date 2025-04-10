@@ -3,12 +3,13 @@ package net.azisaba.vanilife.extension
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.chapter.Chapter
 import net.azisaba.vanilife.chapter.Objective
-import net.azisaba.vanilife.font.HudFont
 import net.azisaba.vanilife.font.DialogueFirstLineFont
 import net.azisaba.vanilife.font.DialogueSecondLineFont
+import net.azisaba.vanilife.font.HudFont
 import net.azisaba.vanilife.font.TitleFont
 import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.registry.Chapters
+import net.azisaba.vanilife.util.runTaskLaterAsync
 import net.azisaba.vanilife.util.runTaskTimerAsync
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
@@ -21,6 +22,7 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.Range
 import java.time.Duration
 import java.util.*
 
@@ -140,11 +142,11 @@ fun Player.sendFishingHud(distance: Double, cps: Int) {
         .append(Component.text(cps.toString().padStart(2, '0'))))
 }
 
-fun Player.showDialogue(component: Component) {
+fun Player.showDialogue(component: Component, also: () -> Unit) {
     val string = GlobalTranslator.render(component, locale()).plainText()
 
     if (string.length <= 36) {
-        showDialogue(component, Component.empty())
+        showDialogue(component, Component.empty(), also = also)
         return
     }
 
@@ -162,10 +164,10 @@ fun Player.showDialogue(component: Component) {
 
     val firstLine = Component.text(if (splitIndex != -1) string.substring(0, splitIndex + 1) else string.substring(0, 36))
     val secondLine = Component.text(if (splitIndex != -1) string.substring(splitIndex + 1)  else string.substring(36))
-    showDialogue(firstLine, secondLine)
+    showDialogue(firstLine, secondLine, also = also)
 }
 
-fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4) {
+fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4, also: () -> Unit = {}) {
     fun build(string: String): String {
         val width = string.sumOf { if (it.code in 0x00..0x7F) 2 else 4.toInt() }
         val remaining = 4 * 32 - width
@@ -192,7 +194,9 @@ fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Cha
 
         if ((if (y == 0) firstLineRaw.length else secondLineRaw.length) <= x++) {
             x = 0
-            return@runTaskTimerAsync ++y < 2
+            val b = ++y < 2
+            if (!b) runTaskLaterAsync(20) { also() }
+            return@runTaskTimerAsync b
         }
         return@runTaskTimerAsync true
     }
@@ -317,5 +321,54 @@ fun OfflinePlayer.hasObjective(objective: Objective): Boolean {
                 return exists
             }
         }
+    }
+}
+
+fun Player.focusItemStack(condition: (ItemStack) -> Boolean): Boolean {
+    for (index in 0..8) {
+        val itemStack = inventory.getItem(index) ?: continue
+        if (condition(itemStack)) {
+            inventory.heldItemSlot = index
+            focusHotbarSlot(index)
+            return true
+        }
+    }
+
+    for (index in 9 until inventory.size) {
+        val itemStack = inventory.getItem(index) ?: continue
+        if (!condition(itemStack)) continue
+        var hotbarKey = -1
+        for (hotbarIndex in 0..8) {
+            val hotbarItemStack = inventory.getItem(hotbarIndex)
+            if (hotbarItemStack == null || hotbarItemStack.type.isAir) {
+                hotbarKey = hotbarIndex
+                break
+            }
+        }
+
+        if (hotbarKey != -1) {
+            inventory.setItem(index, null)
+            inventory.setItem(hotbarKey, itemStack)
+        } else {
+            val hotbarItemStack = inventory.getItem(hotbarKey)
+            inventory.setItem(0, itemStack)
+            inventory.setItem(index, hotbarItemStack)
+        }
+    }
+
+    return false
+}
+
+fun Player.focusHotbarSlot(index: @Range(from = 0, to = 8) Int) {
+    val charArray = TitleFont.SPACE_HOTBAR.toString().repeat(9).toCharArray().apply { set(index, TitleFont.FOCUSED_SLOT) }
+
+    val title = Component.text(String(charArray)).font(TitleFont).shadowColor(ShadowColor.none())
+    val times = Title.Times.times(Duration.ZERO, Duration.ofMillis(500), Duration.ZERO)
+
+    var count = 0
+
+    runTaskTimerAsync(0, 5) {
+        showTitle(Title.title(if (count % 2 == 0) title else Component.empty(), Component.empty(), times))
+        return@runTaskTimerAsync count++ < 10
     }
 }

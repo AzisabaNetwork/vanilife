@@ -1,5 +1,6 @@
 package net.azisaba.vanilife.extension
 
+import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.FoodProperties
 import net.azisaba.vanilife.Vanilife
@@ -106,6 +107,10 @@ fun ItemStack.getEnchantmentLevel(enchantment: CustomEnchantment): Int {
 
 fun ItemStack.hasCustomItemType(): Boolean {
     return customItemType != null
+}
+
+fun ItemStack.toPacketEventsItemStack(): com.github.retrooper.packetevents.protocol.item.ItemStack {
+    return SpigotConversionUtil.fromBukkitItemStack(this)
 }
 
 fun ItemType.toMaterial(): Material {
