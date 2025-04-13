@@ -9,4 +9,8 @@ object TitleFont: RegistryImpl<String, Char>(), Font {
     override val key: Key = Key.key(PLUGIN_ID, "title")
 
     val DIALOGUE = register("dialogue", '\uE001')
+
+    val FOCUSED_SLOT = register("focused_slot", '\uE002')
+
+    val SPACE_HOTBAR = register("space_hotbar", '\uE003')
 }
