@@ -1,27 +1,26 @@
 package net.azisaba.vanilife.item.group
 
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.item.ItemGroup
+import com.tksimeji.gonunne.item.CustomItemType
+import com.tksimeji.gonunne.item.group.ItemGroup
+import com.tksimeji.gonunne.registry.impl.KeyedRegistryImpl
+import com.tksimeji.kunectron.element.Element
+import com.tksimeji.kunectron.element.ItemElement
+import net.azisaba.vanilife.PLUGIN_ID
+import net.azisaba.vanilife.registry.CustomItemTypes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.bukkit.Material
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
-import org.jetbrains.annotations.ApiStatus
+import org.bukkit.inventory.ItemType
 
-@ApiStatus.Internal
-object AllGroup: ItemGroup {
-    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "all")
+object AllGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
+    override val key: Key = Key.key(PLUGIN_ID, "all")
 
-    override val icon: ItemStack = run {
-        val itemStack = ItemStack.of(Material.NETHER_STAR)
-        itemStack.itemMeta = itemStack.itemMeta.apply {
-            addEnchant(Enchantment.INFINITY, 1, false)
-            addItemFlags(ItemFlag.HIDE_ENCHANTS)
-        }
-        itemStack
-    }
+    override val icon: ItemElement = Element.item(ItemType.NETHER_STAR).aura(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.all")
+
+    init {
+        for (customItemType in CustomItemTypes) {
+            register(customItemType)
+        }
+    }
 }

@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    compileOnly("com.tksimeji:kunectron:1.0.0-beta.5")
     implementation(project(":modules:api"))
     implementation(project(":modules:v1_21_4"))
     implementation(project(":modules:v1_21_x"))

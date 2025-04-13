@@ -1,5 +1,8 @@
 package net.azisaba.vanilife.gui
 
+import com.tksimeji.gonunne.item.CustomItemType
+import com.tksimeji.gonunne.item.createItemStack
+import com.tksimeji.gonunne.item.group.ItemGroup
 import com.tksimeji.kunectron.ChestGui
 import com.tksimeji.kunectron.Kunectron
 import com.tksimeji.kunectron.element.Element
@@ -7,10 +10,6 @@ import com.tksimeji.kunectron.event.ChestGuiEvents
 import com.tksimeji.kunectron.event.GuiHandler
 import com.tksimeji.kunectron.hooks.ChestGuiHooks
 import com.tksimeji.kunectron.policy.Policy
-import net.azisaba.vanilife.extension.createItemStack
-import net.azisaba.vanilife.item.CustomItemType
-import net.azisaba.vanilife.item.ItemGroup
-import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.registry.ItemGroups
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -21,7 +20,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 @ChestGui
-class ItemListGui(@ChestGui.Player private val player: Player, private val group: ItemGroup = ItemGroups.ALL, private val page: Int = 0, private val searchQuery: String? = null): ChestGuiHooks, Searchable {
+class ItemListGui(@ChestGui.Player private val player: Player, private val group: ItemGroup = ItemGroups.ALL, private val page: Int = 0, private val query: String? = null): ChestGuiHooks, Searchable {
     companion object {
         private val GROUP_INDEXES = (1..7).toList()
         private val ITEM_INDEXES = listOf(19..25, 28..34, 37..43).flatten()
@@ -31,10 +30,10 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
 
     private val groupChunk = CHUNKED_GROUPS.first { it.contains(group) }
 
-    private val customItemTypes = search(group, searchQuery)
+    private val customItemTypes = search(group, query)
 
     @ChestGui.Title
-    private val title = if (searchQuery == null) {
+    private val title = if (query == null) {
         Component.translatable("gui.itemList")
             .append(Component.text(":"))
             .append(group.title)
@@ -44,7 +43,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
         Component.translatable("gui.itemList.searchResult")
             .append(Component.text(":"))
             .appendSpace()
-            .append(Component.text(searchQuery))
+            .append(Component.text(query))
     }
 
     @ChestGui.Element(index = [9])
@@ -59,7 +58,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
             }
 
             val previousChunk = CHUNKED_GROUPS[currentChunk - 1]
-            Kunectron.create(ItemListGui(player, previousChunk.first(), searchQuery = searchQuery))
+            Kunectron.create(ItemListGui(player, previousChunk.first(), query = query))
         }
 
     @ChestGui.Element(index = [17])
@@ -74,7 +73,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
             }
 
             val nextChunk = CHUNKED_GROUPS[currentChunk + 1]
-            Kunectron.create(ItemListGui(player, nextChunk.first(), searchQuery = searchQuery))
+            Kunectron.create(ItemListGui(player, nextChunk.first(), query = query))
         }
 
     @ChestGui.Element(index = [45])
@@ -105,9 +104,7 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
     }
 
     private fun search(group: ItemGroup, query: String?): List<CustomItemType> {
-        return (if (group == ItemGroups.ALL) CustomItemTypes.values else CustomItemTypes.filter { it.group == group })
-            .filter { searchQuery == null || it.key.asString().contains(searchQuery, ignoreCase = true) }
-            .toList()
+        return group.filter { query == null || it.key.asString().contains(query, ignoreCase = true) }.toList()
     }
 
     @GuiHandler
@@ -123,10 +120,10 @@ class ItemListGui(@ChestGui.Player private val player: Player, private val group
 
             val index2 = GROUP_INDEXES[index]
 
-            useElement(index2, Element.item(group.icon)
+            useElement(index2, group.icon
                 .title(group.title.colorIfAbsent(if (group == this.group) NamedTextColor.WHITE else NamedTextColor.GRAY).decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE))
-                .lore(Component.translatable("gui.itemList.tab.description", Component.text(search(group, searchQuery).size)).color(NamedTextColor.DARK_GRAY))
-                .handler { -> Kunectron.create(ItemListGui(player, group, searchQuery = searchQuery)) })
+                .lore(Component.translatable("gui.itemList.tab.description", Component.text(search(group, query).size)).color(NamedTextColor.DARK_GRAY))
+                .handler { -> Kunectron.create(ItemListGui(player, group, query = query)) })
 
             useElement(index2 + 9, Element.item(if (group == this.group) ItemType.GREEN_STAINED_GLASS_PANE else ItemType.GRAY_STAINED_GLASS_PANE))
         }

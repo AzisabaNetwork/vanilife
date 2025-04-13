@@ -1,5 +1,6 @@
 package net.azisaba.vanilife.listener
 
+import com.tksimeji.gonunne.world.toPaperBiome
 import net.azisaba.vanilife.registry.CustomBiomes
 import org.bukkit.Tag
 import org.bukkit.event.EventHandler

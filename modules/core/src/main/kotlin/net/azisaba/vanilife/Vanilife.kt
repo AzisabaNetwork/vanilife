@@ -3,11 +3,13 @@ package net.azisaba.vanilife
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.decodeFromStream
 import com.github.retrooper.packetevents.PacketEvents
+import com.tksimeji.gonunne.Adapter
+import com.tksimeji.gonunne.key.toNamespacedKey
+import com.tksimeji.gonunne.world.ParameterPoint
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder
 import net.azisaba.vanilife.data.Config
-import net.azisaba.vanilife.extension.toNamespacedKey
 import net.azisaba.vanilife.listener.*
 import net.azisaba.vanilife.registry.CustomBiomes
 import net.azisaba.vanilife.registry.CustomRecipes
@@ -17,11 +19,10 @@ import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
 import net.azisaba.vanilife.util.runTaskTimerAsync
 import net.azisaba.vanilife.world.SimpleChunkGenerator
-import net.azisaba.vanilife.world.biome.ParameterList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import net.kyori.adventure.translation.GlobalTranslator
-import net.kyori.adventure.translation.TranslationRegistry
+import net.kyori.adventure.translation.TranslationStore
 import org.bukkit.Bukkit
 import org.bukkit.WorldCreator
 import org.bukkit.plugin.java.JavaPlugin
@@ -29,11 +30,7 @@ import java.io.File
 
 class Vanilife : JavaPlugin() {
     companion object {
-        const val PLUGIN_ID = "vanilife"
-
         const val DATABASE_PLAYER = "player"
-        const val DATABASE_PLAYER_CHAPTER = "player_chapter"
-        const val DATABASE_PLAYER_OBJECTIVE = "player_objective"
 
         lateinit var plugin: Vanilife
 
@@ -47,7 +44,7 @@ class Vanilife : JavaPlugin() {
         val adapter: Adapter
             get() = V1_21_4
 
-        val translationRegistry = TranslationRegistry.create(Key.key(PLUGIN_ID, "translation"))
+        val translationRegistry = TranslationStore.messageFormat(Key.key(PLUGIN_ID, "translation"))
 
         fun reloadPluginConfig() {
             pluginConfig = Yaml.default.decodeFromStream(File(plugin.dataFolder, "config.yml").inputStream())
@@ -57,7 +54,7 @@ class Vanilife : JavaPlugin() {
                 username = System.getenv(pluginConfig.database.usernameEnv)
                 password = System.getenv(pluginConfig.database.passwordEnv)
                 driverClassName = "org.mariadb.jdbc.Driver"
-                maximumPoolSize = pluginConfig.database.maximumPoolSize
+                maximumPoolSize = pluginConfig.database.maxPoolSize
             }
 
             if (!::dataSource.isInitialized ||
@@ -87,8 +84,6 @@ class Vanilife : JavaPlugin() {
         reloadPluginConfig()
 
         createTableIfNotExists(DATABASE_PLAYER, ":uuid VARCHAR(36) NOT NULL PRIMARY KEY, level SMALLINT UNSIGNED NOT NULL")
-        createTableIfNotExists(DATABASE_PLAYER_CHAPTER, ":player VARCHAR(36) NOT NULL, chapter VARCHAR(256) NOT NULL, PRIMARY KEY (player, chapter)")
-        createTableIfNotExists(DATABASE_PLAYER_OBJECTIVE, ":player VARCHAR(36) NOT NULL, objective VARCHAR(256) NOT NULL, PRIMARY KEY (player, objective)")
 
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
@@ -118,7 +113,7 @@ class Vanilife : JavaPlugin() {
         PacketEvents.getAPI().init()
 
         val creator = WorldCreator(Key.key(PLUGIN_ID, "overworld").toNamespacedKey())
-            .generator(SimpleChunkGenerator(adapter.createBiomeProvider(ParameterList.OVERWORLD, CustomBiomes.SALT_LAKE)))
+            .generator(SimpleChunkGenerator(adapter.createOverworldBiomeProvider(Pair(ParameterPoint.parameterPoint(), CustomBiomes.SALT_LAKE))))
         creator.createWorld()
     }
 

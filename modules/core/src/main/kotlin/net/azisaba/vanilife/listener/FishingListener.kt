@@ -1,13 +1,12 @@
 package net.azisaba.vanilife.listener
 
+import com.tksimeji.gonunne.world.distance2D
 import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.extension.distance2D
 import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.FishingRodAnimationRunnable
 import net.azisaba.vanilife.runnable.FishingRunnable
 import net.azisaba.vanilife.runnable.FishingRunnable.Companion.runnable
 import net.azisaba.vanilife.util.runTaskLaterAsync
-import org.bukkit.Sound
 import org.bukkit.entity.FishHook
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -51,7 +50,7 @@ object FishingListener: Listener {
 
         val hookLike = runnable.entity
         hookLike.velocity = oppositeDirection.multiply(-0.3)
-        if (hookLike.location.distance2D(player.location) < 3 && runnable.fish != null) {
+        if (hookLike.location.distance2D(player.location) < 3 && runnable.fishingEntry != null) {
             runnable.caught()
         }
 

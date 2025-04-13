@@ -1,9 +1,8 @@
 package net.azisaba.vanilife.listener
 
-import net.azisaba.vanilife.extension.RECIPE_EXTENSION_HANDLERS
-import net.azisaba.vanilife.extension.RECIPE_EXTENSION_INGREDIENTS
-import net.azisaba.vanilife.extension.customItemType
-import net.azisaba.vanilife.extension.toItemType
+import com.tksimeji.gonunne.recipe.DamageableShapelessRecipe
+import net.azisaba.vanilife.extensions.customItemType
+import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.util.runTaskLater
 import net.kyori.adventure.key.Keyed
 import org.bukkit.event.EventHandler
@@ -22,41 +21,33 @@ object RecipeListener: Listener {
             return
         }
 
-        RECIPE_EXTENSION_HANDLERS[recipe.key()]?.let { it(event) }
-
+        val damageableShapelessRecipe = CustomRecipes.get(recipe.key()) as? DamageableShapelessRecipe ?: return
         val inventory = event.inventory
 
-        val triple = RECIPE_EXTENSION_INGREDIENTS.firstOrNull { it.first == recipe.key() } ?: return
-        val type = triple.second
-        val cost = triple.third
+        val matrix = inventory.matrix.map { it?.clone() }.toTypedArray()
+        val result = mutableMapOf<Int, ItemStack?>()
 
-        val matrix1 = inventory.matrix.map { it?.clone() }.toTypedArray()
-        val damagedLayerMap = mutableMapOf<Int, ItemStack?>()
+        for (damageableIngredient in damageableShapelessRecipe.damageableIngredients) {
+            for ((index, ingredient) in matrix.withIndex()) {
+                if (ingredient == null || (ingredient.type != damageableIngredient.type && ingredient.customItemType() != damageableIngredient.type)) {
+                    continue
+                }
 
-        for ((index, ingredient) in matrix1.withIndex()) {
-            if (ingredient == null || (ingredient.type.toItemType() != type && ingredient.customItemType != type)) {
-                continue
-            }
+                val itemMeta = ingredient.itemMeta as? Damageable ?: continue
+                itemMeta.damage += damageableIngredient.damage
+                ingredient.itemMeta = itemMeta
 
-            val itemMeta = ingredient.itemMeta
-
-            if (itemMeta !is Damageable) {
-                continue
-            }
-
-            itemMeta.damage += cost
-            ingredient.apply { this.itemMeta = itemMeta }
-
-            if (itemMeta.damage < ingredient.type.maxDurability) {
-                damagedLayerMap[index] = ingredient
-            } else {
-                damagedLayerMap[index] = null
+                if (itemMeta.damage < ingredient.type.maxDurability) {
+                    result[index] = ingredient
+                } else {
+                    result[index] = null
+                }
             }
         }
 
         runTaskLater(1) {
             val matrix2 = inventory.matrix
-            for ((index, itemStack) in damagedLayerMap) {
+            for ((index, itemStack) in result) {
                 matrix2[index] = itemStack
             }
             inventory.matrix = matrix2

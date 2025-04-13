@@ -1,8 +1,10 @@
 package net.azisaba.vanilife.registry
 
+import com.tksimeji.gonunne.item.CustomItemType
+import com.tksimeji.gonunne.registry.impl.KeyedRegistryImpl
 import net.azisaba.vanilife.item.*
 
-object CustomItemTypes: KeyedRegistry<CustomItemType>() {
+object CustomItemTypes: KeyedRegistryImpl<CustomItemType>() {
     val APPLE_JAM = register(AppleJam)
     val BACON = register(Bacon)
     val BANANA = register(Banana)

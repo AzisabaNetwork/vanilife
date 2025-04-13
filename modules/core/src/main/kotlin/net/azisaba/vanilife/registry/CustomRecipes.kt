@@ -1,95 +1,100 @@
 package net.azisaba.vanilife.registry
 
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.extension.*
-import net.azisaba.vanilife.item.CustomItemType
-import net.azisaba.vanilife.item.Fruit
+import com.tksimeji.gonunne.item.CustomItemType
+import com.tksimeji.gonunne.item.Fruit
+import com.tksimeji.gonunne.item.createItemStack
+import com.tksimeji.gonunne.key.toNamespacedKey
+import com.tksimeji.gonunne.recipe.DamageableShapelessRecipe
+import com.tksimeji.gonunne.registry.impl.RegistryImpl
+import net.azisaba.vanilife.PLUGIN_ID
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.inventory.CraftingRecipe
-import org.bukkit.inventory.ItemType
+import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 
-object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
-    val APPLE_JAM = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "apple_jam").toNamespacedKey(), CustomItemTypes.APPLE_JAM.createItemStack()).apply {
-        addIngredient(ItemType.APPLE.createItemStack())
-        addIngredient(ItemType.SUGAR.createItemStack())
-        addIngredient(ItemType.GLASS_BOTTLE.createItemStack())
+object CustomRecipes: RegistryImpl<Key, Recipe>() {
+    val APPLE_JAM = register(ShapelessRecipe(Key.key(PLUGIN_ID, "apple_jam").toNamespacedKey(), CustomItemTypes.APPLE_JAM.createItemStack()).apply {
+        addIngredient(Material.APPLE)
+        addIngredient(Material.SUGAR)
+        addIngredient(Material.GLASS_BOTTLE)
     })
 
-    val BACON = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "bacon").toNamespacedKey(), CustomItemTypes.BACON.createItemStack()).apply {
+    val BACON = register(ShapelessRecipe(Key.key(PLUGIN_ID, "bacon").toNamespacedKey(), CustomItemTypes.BACON.createItemStack()).apply {
         addIngredient(Material.PORKCHOP)
         addIngredient(CustomItemTypes.SALT.createItemStack())
     })
 
-    val BUTTER = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "butter").toNamespacedKey(), CustomItemTypes.BUTTER.createItemStack()).apply {
+    val BUTTER = register(ShapelessRecipe(Key.key(PLUGIN_ID, "butter").toNamespacedKey(), CustomItemTypes.BUTTER.createItemStack()).apply {
         addIngredient(Material.MILK_BUCKET)
         addIngredient(CustomItemTypes.SALT.createItemStack())
     })
 
-    val BUTTERED_POTATO = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "buttered_potato").toNamespacedKey(), CustomItemTypes.BUTTERED_POTATO.createItemStack()).apply {
+    val BUTTERED_POTATO = register(ShapelessRecipe(Key.key(PLUGIN_ID, "buttered_potato").toNamespacedKey(), CustomItemTypes.BUTTERED_POTATO.createItemStack()).apply {
         addIngredient(Material.BAKED_POTATO)
         addIngredient(CustomItemTypes.SALT.createItemStack())
         addIngredient(CustomItemTypes.BUTTER.createItemStack())
     })
     
-    val CHEESE = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "cheese").toNamespacedKey(), CustomItemTypes.CHEESE.createItemStack()).apply {
+    val CHEESE = register(ShapelessRecipe(Key.key(PLUGIN_ID, "cheese").toNamespacedKey(), CustomItemTypes.CHEESE.createItemStack()).apply {
         addIngredient(Material.MILK_BUCKET)
         addIngredient(CustomItemTypes.ROCK_SALT.createItemStack())
     })
 
-    val DOUGH = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "dough").toNamespacedKey(), CustomItemTypes.DOUGH.createItemStack()).apply {
+    val DOUGH = register(ShapelessRecipe(Key.key(PLUGIN_ID, "dough").toNamespacedKey(), CustomItemTypes.DOUGH.createItemStack()).apply {
         addIngredient(Material.WATER_BUCKET)
         addIngredient(CustomItemTypes.SALT.createItemStack())
         addIngredient(CustomItemTypes.WHEAT_FLOUR.createItemStack())
     })
 
-    val FRUIT_SANDWICH = createSandwichRecipes("sruit_sandwich", CustomItemTypes.FRUIT_SANDWICH, CustomItemTypes.filter { it is Fruit })
+    val FRUIT_SANDWICH = registerSandwichRecipes("sruit_sandwich", CustomItemTypes.FRUIT_SANDWICH, CustomItemTypes.filterIsInstance<Fruit>())
 
-    val KNIFE = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "knife").toNamespacedKey(), CustomItemTypes.KNIFE.createItemStack()).apply {
+    val KNIFE = register(ShapedRecipe(Key.key(PLUGIN_ID, "knife").toNamespacedKey(), CustomItemTypes.KNIFE.createItemStack()).apply {
         shape("I", "S")
-        setIngredient('I', ItemType.IRON_INGOT.createItemStack())
-        setIngredient('S', ItemType.STICK.createItemStack())
+        setIngredient('I', Material.IRON_INGOT)
+        setIngredient('S', Material.STICK)
     })
 
-    val MAYONNAISE = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "mayonnaise").toNamespacedKey(), CustomItemTypes.MAYONNAISE.createItemStack()).apply {
-        addIngredient(ItemType.EGG.createItemStack())
-        addIngredient(ItemType.GLASS_BOTTLE.createItemStack())
+    val MAYONNAISE = register(ShapelessRecipe(Key.key(PLUGIN_ID, "mayonnaise").toNamespacedKey(), CustomItemTypes.MAYONNAISE.createItemStack()).apply {
+        addIngredient(Material.EGG)
+        addIngredient(Material.GLASS_BOTTLE)
     })
 
-    val SALT = register(ShapedRecipe(Key.key(Vanilife.PLUGIN_ID, "salt").toNamespacedKey(), CustomItemTypes.SALT.createItemStack()).apply {
+    val SALT = register(ShapedRecipe(Key.key(PLUGIN_ID, "salt").toNamespacedKey(), CustomItemTypes.SALT.createItemStack()).apply {
         shape("RR", "RR")
         setIngredient('R', CustomItemTypes.ROCK_SALT.createItemStack())
     })
 
-    val SANDWICH = createSandwichRecipes("sandwich", CustomItemTypes.SANDWICH, listOf(CustomItemTypes.BACON, CustomItemTypes.LETTUCE, CustomItemTypes.SLICED_TOMATO))
+    val SANDWICH = registerSandwichRecipes("sandwich", CustomItemTypes.SANDWICH, listOf(CustomItemTypes.BACON, CustomItemTypes.LETTUCE, CustomItemTypes.SLICED_TOMATO))
 
-    val SLICED_TOMATO = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "sliced_tomato").toNamespacedKey(), CustomItemTypes.SLICED_TOMATO.createItemStack(3)).apply {
+    val SLICED_TOMATO = register(DamageableShapelessRecipe(Key.key(PLUGIN_ID, "sliced_tomato").toNamespacedKey(), CustomItemTypes.SLICED_TOMATO.createItemStack(3)).apply {
         addIngredient(CustomItemTypes.TOMATO.createItemStack())
         addDamageableIngredient(CustomItemTypes.KNIFE, 4)
     })
 
-    val WHEAT_FLOUR = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "wheat_flour").toNamespacedKey(), CustomItemTypes.WHEAT_FLOUR.createItemStack()).apply {
-        addIngredient(ItemType.WHEAT.createItemStack())
+    val WHEAT_FLOUR = register(DamageableShapelessRecipe(Key.key(PLUGIN_ID, "wheat_flour").toNamespacedKey(), CustomItemTypes.WHEAT_FLOUR.createItemStack()).apply {
+        addIngredient(Material.WHEAT)
         addDamageableIngredient(CustomItemTypes.KNIFE, 10)
-        setCraftSound(Sound.UI_STONECUTTER_TAKE_RESULT, pitch = 0.1F)
     })
 
-    val WHITE_TOAST = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "white_bread").toNamespacedKey(), CustomItemTypes.WHITE_BREAD.createItemStack()).apply {
+    val WHITE_TOAST = register(ShapelessRecipe(Key.key(PLUGIN_ID, "white_bread").toNamespacedKey(), CustomItemTypes.WHITE_BREAD.createItemStack()).apply {
         addIngredient(Material.SUGAR)
         addIngredient(CustomItemTypes.DOUGH.createItemStack())
         addIngredient(CustomItemTypes.YEAST.createItemStack())
     })
 
-    val YEAST = register(ShapelessRecipe(Key.key(Vanilife.PLUGIN_ID, "yeast").toNamespacedKey(), CustomItemTypes.YEAST.createItemStack()).apply {
+    val YEAST = register(ShapelessRecipe(Key.key(PLUGIN_ID, "yeast").toNamespacedKey(), CustomItemTypes.YEAST.createItemStack()).apply {
         addIngredient(Material.BROWN_MUSHROOM)
         addIngredient(Material.SUGAR)
         addIngredient(Material.WHEAT)
     })
 
-    private fun createSandwichRecipes(name: String, result: CustomItemType, fillings: List<CustomItemType>): List<ShapedRecipe> {
+    private fun <T: CraftingRecipe> register(craftingRecipe: T): T {
+        return register(craftingRecipe.key, craftingRecipe)
+    }
+
+    private fun registerSandwichRecipes(name: String, result: CustomItemType, fillings: List<CustomItemType>): List<ShapedRecipe> {
         if (fillings.size < 3) {
             throw IllegalArgumentException("Filling must be 3 or more.")
         }
@@ -112,7 +117,7 @@ object CustomRecipes: KeyedRegistry<CraftingRecipe>() {
                     val filling2 = fillings[j]
                     val filling3 = fillings[k]
 
-                    val key = Key.key(Vanilife.PLUGIN_ID, "${name}_${filling1.key().value()}_${filling2.key().value()}_${filling3.key().value()}")
+                    val key = Key.key(PLUGIN_ID, "${name}_${filling1.key().value()}_${filling2.key().value()}_${filling3.key().value()}")
                     val recipe = ShapedRecipe(key.toNamespacedKey(), result.createItemStack()).apply {
                         shape("BBB", "XYZ", "BBB")
                         setIngredient('B', CustomItemTypes.WHITE_BREAD.createItemStack())

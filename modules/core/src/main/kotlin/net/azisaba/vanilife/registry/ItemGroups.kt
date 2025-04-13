@@ -1,9 +1,10 @@
 package net.azisaba.vanilife.registry
 
-import net.azisaba.vanilife.item.ItemGroup
+import com.tksimeji.gonunne.item.group.ItemGroup
+import com.tksimeji.gonunne.registry.impl.KeyedRegistryImpl
 import net.azisaba.vanilife.item.group.*
 
-object ItemGroups: KeyedRegistry<ItemGroup>() {
+object ItemGroups: KeyedRegistryImpl<ItemGroup>() {
     val ALL = register(AllGroup)
 
     val FISH = register(FishGroup)
@@ -17,8 +18,6 @@ object ItemGroups: KeyedRegistry<ItemGroup>() {
     val MATERIAL = register(MaterialGroup)
 
     val MONEY = register(MoneyGroup)
-
-    val RECIPE = register(RecipeGroup)
 
     val TOOL = register(ToolGroup)
 

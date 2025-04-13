@@ -6,7 +6,7 @@
 
 ### 1-1. 定義オブジェクトの作成
 
-`net.azisaba.vanilife.item.CustomItemType` を実装して定義オブジェクトを作成します。
+`com.tksimeji.gonunne.item.CustomItemType` を実装して定義オブジェクトを作成します。
 
 機能的なカスタムアイテムを作成する方法として、`CustomItemType` を継承したいくつかのインターフェースが提供されます。
 
@@ -34,9 +34,6 @@ object AppleJam: CustomItemType {
     
     // 任意: 説明欄を指定します 基本的には生のテキストではなく、翻訳テキストを使用してください
     override val lore: List<Component> = listOf(Component.translatable("item.vanilife.apple_jam.description"))
-    
-    // アイテムグループを指定します これはアイテムリストのタブを意味します
-    override val group: ItemGroup = ItemGroups.FOODSTUFF
     
     // 任意: アイテムの希少度を指定します Mojang のガイドラインに基づいてください (https://ja.minecraft.wiki/w/希少度#段階)
     override val rarity: ItemRarity = ItemRarity.COMMON
@@ -73,7 +70,7 @@ object AppleJam: CustomItemType {
 > レジストリ内のプロパティはアルファベット順に並べてください
 
 ```kotlin
-object CustomItemTypes: KeyedRegistry<CustomItemType>() {
+object CustomItemTypes: KeyedRegistryImpl<CustomItemType>() {
     val APPLE_JAM = register(AppleJam)
     // 登録が続きます…
 }
@@ -99,7 +96,7 @@ val itemStack = CustomItemTypes.APPLE_JAM.createItemStack()
 カスタムアイテムかを確認するには、`hasCustomItemType()` を呼び出します。
 
 > [!TIP]
-> これらのプロパティ・メソッドは `net.azisaba.vanilife.extension.ItemExtension` から
+> これらのプロパティ・メソッドは `net.azisaba.vanilife.extensions.ItemExtensions` から
 > 拡張プロパティ・メソッドとして提供されます。
 
 ```kotlin

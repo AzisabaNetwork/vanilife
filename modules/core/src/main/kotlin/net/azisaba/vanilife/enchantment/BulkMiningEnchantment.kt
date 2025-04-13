@@ -1,75 +1,67 @@
 package net.azisaba.vanilife.enchantment
 
+import com.tksimeji.gonunne.enchantment.CustomEnchantment
+import com.tksimeji.gonunne.enchantment.context.BlockBreakContext
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffectEvent
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffects
+import com.tksimeji.gonunne.enchantment.getEnchantmentLevel
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.registry.tag.TagKey
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.extension.toMaterial
+import net.azisaba.vanilife.PLUGIN_ID
 import net.azisaba.vanilife.registry.CustomEnchantments
-import net.azisaba.vanilife.registry.CustomTags
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemType
 
-object BulkMiningEnchantment: ToolEnchantment {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "bulk_mining")
+object BulkMiningEnchantment: CustomEnchantment {
+    override val key: Key = Key.key(PLUGIN_ID, "bulk_mining")
 
-    override val displayName: Component
-        get() = Component.translatable("enchantment.vanilife.bulk_mining")
+    override val displayName: Component = Component.translatable("enchantment.vanilife.bulk_mining")
 
-    override val maximumLevel: Int
-        get() = 2
+    override val maxLevel: Int = 2
 
-    override val maximumCost: EnchantmentRegistryEntry.EnchantmentCost
-        get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 1)
+    override val maxCost: EnchantmentRegistryEntry.EnchantmentCost = EnchantmentRegistryEntry.EnchantmentCost.of(1, 1)
 
-    override val minimumCost: EnchantmentRegistryEntry.EnchantmentCost
-        get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
+    override val minCost: EnchantmentRegistryEntry.EnchantmentCost = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
 
-    override val anvilCost: Int
-        get() = 1
+    override val anvilCost: Int = 8
 
-    override val supportedItems: TagKey<ItemType>
-        get() = ItemTypeTagKeys.PICKAXES
+    override val enchantingTableWeight: Int = 1
 
-    override val exclusives: Set<Keyed>
-        get() = setOf(CustomEnchantments.RANGE_MINING)
+    override val activeSlots: Set<EquipmentSlotGroup> = setOf(EquipmentSlotGroup.MAINHAND)
 
-    override fun use(player: Player, blocks: MutableSet<Block>, itemStack: ItemStack, enchantment: Enchantment) {
-        if (blocks.size != 1) {
-            return
+    override val exclusiveSet: Set<Keyed> = setOf(CustomEnchantments.RANGE_MINING)
+
+    override val supportedItems: TagKey<ItemType> = ItemTypeTagKeys.PICKAXES
+
+    override val effects: EnchantmentEffects = EnchantmentEffects.create()
+        .add(EnchantmentEffectEvent.BREAK_BLOCK) { ctx ->
+            val block = ctx.blocks.firstOrNull() ?: return@add
+            if (block.type != Material.IRON_ORE) {
+                return@add
+            }
+            /* if (!CustomTags.ORE.map { it.toMaterial() }.contains(block.type)) {
+                return@add
+            } */
+            breakBlock(block.type, block, block, ctx)
         }
 
-        val block = blocks.first()
+    private fun breakBlock(type: Material, block: Block, source: Block, context: BlockBreakContext) {
+        context.blocks.add(block)
 
-        if (!CustomTags.ORE.map { it.toMaterial() }.contains(block.type)) {
-            return
-        }
+        for (face in BlockFace.entries) {
+            val relativeBlock = block.getRelative(face)
+            if (relativeBlock.type != type) continue
 
-        fun mine(block: Block, source: Block, type: Material = source.type) {
-            blocks.add(block)
-
-            for (face in BlockFace.entries) {
-                val relativeBlock = block.getRelative(face)
-
-                if (relativeBlock.type != type) {
-                    continue
-                }
-
-                if (relativeBlock.location.distance(source.location) <= itemStack.getEnchantmentLevel(enchantment)) {
-                    mine(relativeBlock, source, type)
-                }
+            if (relativeBlock.location.distance(source.location) <= context.itemStack.getEnchantmentLevel(this)) {
+                breakBlock(type, relativeBlock, source, context)
             }
         }
-
-        mine(block, block)
     }
 }

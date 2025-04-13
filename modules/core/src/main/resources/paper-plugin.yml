@@ -1,7 +1,7 @@
 name: vanilife
 version: '0.0.0'
 main: net.azisaba.vanilife.Vanilife
-bootstrapper: net.azisaba.vanilife.VanilifeBootstrap
+bootstrapper: net.azisaba.vanilife.Bootstrap
 api-version: '1.21'
 dependencies:
   server:

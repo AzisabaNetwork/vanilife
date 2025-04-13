@@ -1,6 +1,6 @@
 package net.azisaba.vanilife.world
 
-import net.azisaba.vanilife.extension.customBiome
+import net.azisaba.vanilife.extensions.customBiome
 import org.bukkit.HeightMap
 import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.ChunkGenerator
@@ -19,7 +19,7 @@ open class SimpleChunkGenerator(private val biomeProvider: BiomeProvider): Chunk
         for (x in 0 until 16) {
             for (y in worldInfo.minHeight..worldInfo.maxHeight) {
                 for (z in 0 until 16) {
-                    val biome = chunkData.getBiome(x, y, z).customBiome ?: continue
+                    val biome = chunkData.getBiome(x, y, z).customBiome() ?: continue
                     generate(chunkData, x, y, z, chunkX, chunkZ, worldInfo, biome::generateNoise)
                 }
             }
@@ -30,7 +30,7 @@ open class SimpleChunkGenerator(private val biomeProvider: BiomeProvider): Chunk
         for (x in 0 until 16) {
             for (z in 0 until 16) {
                 val height = chunkData.getHeight(HeightMap.WORLD_SURFACE_WG, x, z)
-                val biome = chunkData.getBiome(x, height, z).customBiome ?: continue
+                val biome = chunkData.getBiome(x, height, z).customBiome() ?: continue
                 generate(chunkData, x, height, z, chunkX, chunkZ, worldInfo, biome::generateSurface)
             }
         }
@@ -40,7 +40,7 @@ open class SimpleChunkGenerator(private val biomeProvider: BiomeProvider): Chunk
         for (x in 0 until 16) {
             for (y in worldInfo.minHeight..worldInfo.maxHeight) {
                 for (z in 0 until 16) {
-                    val biome = chunkData.getBiome(x, y, z).customBiome ?: continue
+                    val biome = chunkData.getBiome(x, y, z).customBiome() ?: continue
                     generate(chunkData, x, y, z, chunkX, chunkZ, worldInfo, biome::generateCaves)
                 }
             }

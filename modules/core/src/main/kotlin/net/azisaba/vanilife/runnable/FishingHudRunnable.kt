@@ -1,7 +1,7 @@
 package net.azisaba.vanilife.runnable
 
-import net.azisaba.vanilife.extension.distance2D
-import net.azisaba.vanilife.extension.sendFishingHud
+import com.tksimeji.gonunne.world.distance2D
+import net.azisaba.vanilife.extensions.sendFishingHud
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*

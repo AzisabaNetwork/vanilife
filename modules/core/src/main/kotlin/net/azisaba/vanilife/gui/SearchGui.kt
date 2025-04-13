@@ -15,7 +15,7 @@ class SearchGui(@AnvilGui.Player private val player: Player, private val target:
 
     @GuiHandler
     fun onClose(event: AnvilGuiEvents.CloseEvent) {
-        target.search(if (event.text.isBlank()) null else event.text)
+        target.search(event.text.ifBlank { null })
     }
 
     @GuiHandler

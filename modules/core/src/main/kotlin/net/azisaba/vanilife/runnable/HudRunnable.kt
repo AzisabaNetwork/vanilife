@@ -1,8 +1,8 @@
 package net.azisaba.vanilife.runnable
 
-import net.azisaba.vanilife.extension.lv
-import net.azisaba.vanilife.extension.money
-import net.azisaba.vanilife.extension.sendHud
+import net.azisaba.vanilife.extensions.lv
+import net.azisaba.vanilife.extensions.money
+import net.azisaba.vanilife.extensions.sendHud
 import net.azisaba.vanilife.font.HudFont
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor

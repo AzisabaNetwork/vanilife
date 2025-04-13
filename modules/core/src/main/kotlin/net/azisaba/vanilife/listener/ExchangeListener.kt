@@ -1,9 +1,9 @@
 package net.azisaba.vanilife.listener
 
-import net.azisaba.vanilife.extension.createItemStack
-import net.azisaba.vanilife.extension.customItemType
-import net.azisaba.vanilife.extension.matrixSlots
-import net.azisaba.vanilife.extension.resultSlot
+import com.tksimeji.gonunne.item.createItemStack
+import net.azisaba.vanilife.extensions.customItemType
+import net.azisaba.vanilife.extensions.matrixIndexes
+import net.azisaba.vanilife.extensions.resultIndex
 import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.util.runTaskLater
 import org.bukkit.entity.Player
@@ -24,9 +24,9 @@ object ExchangeListener: Listener {
         val player = (event.whoClicked as? Player) ?: return
         val inventory = (event.clickedInventory as? CraftingInventory) ?: return
         val slot = event.slot
-        if (inventory.matrixSlots.contains(slot)) {
+        if (inventory.matrixIndexes.contains(slot)) {
             updateResult(ExchangeInfo(player, inventory, event.action))
-        } else if (slot == inventory.resultSlot) {
+        } else if (slot == inventory.resultIndex) {
             takeResult(ExchangeInfo(player, inventory, event.action))
         }
     }
@@ -35,7 +35,7 @@ object ExchangeListener: Listener {
     fun onInventoryDrag(event: InventoryDragEvent) {
         val player = (event.whoClicked as? Player) ?: return
         val inventory = (event.inventorySlots as? CraftingInventory) ?: return
-        if (event.inventorySlots.any { it in inventory.matrixSlots }) {
+        if (event.inventorySlots.any { it in inventory.matrixIndexes }) {
             updateResult(ExchangeInfo(player, inventory))
         }
     }
@@ -52,13 +52,13 @@ object ExchangeListener: Listener {
             return
         }
 
-        val inputs = inventory.matrixSlots.filter { inventory.getItem(it) != null }
+        val inputs = inventory.matrixIndexes.filter { inventory.getItem(it) != null }
             .map { it to inventory.getItem(it)!! }
-            .takeIf { it.isNotEmpty() && it.all { entry -> entry.second.customItemType is Money && entry.second.isSimilar(it.first().second) } } ?: return
-        val inputType = inputs.first().second.customItemType!! as Money
+            .takeIf { it.isNotEmpty() && it.all { entry -> entry.second.customItemType() is Money && entry.second.isSimilar(it.first().second) } } ?: return
+        val inputType = inputs.first().second.customItemType()!! as Money
 
-        val result = inventory.getItem(inventory.resultSlot)
-        val resultType = (result?.customItemType as? Money) ?: return
+        val result = inventory.getItem(inventory.resultIndex)
+        val resultType = (result?.customItemType() as? Money) ?: return
 
         var amount = if (resultType.maxStackSize < result.amount) resultType.maxStackSize else result.amount
 
@@ -95,24 +95,24 @@ object ExchangeListener: Listener {
         updating.add(uuid)
         runTaskLater(1) {
             val inventory = info.inventory
-            val inputs = inventory.matrixSlots.mapNotNull { inventory.getItem(it) }
+            val inputs = inventory.matrixIndexes.mapNotNull { inventory.getItem(it) }
 
-            if (inputs.isEmpty() || inputs.any { it.customItemType !is Money || !it.isSimilar(inputs.first()) }) {
+            if (inputs.isEmpty() || inputs.any { it.customItemType() !is Money || !it.isSimilar(inputs.first()) }) {
                 return@runTaskLater
             }
 
             val amount = inputs.sumOf { it.amount }
 
-            inventory.clear(inventory.resultSlot)
+            inventory.clear(inventory.resultIndex)
 
             for (i in amount downTo 0) {
                 val result = (Money.EXCHANGE_MAP[inputs.first().clone().apply { this.amount = i }] ?: continue).clone()
                 for (j in 1..(amount / i)) {
-                    val resultSlotItem = inventory.getItem(inventory.resultSlot)
+                    val resultSlotItem = inventory.getItem(inventory.resultIndex)
                     if (resultSlotItem != null) {
                         resultSlotItem.amount += result.amount
                     } else {
-                        inventory.setItem(inventory.resultSlot, result)
+                        inventory.setItem(inventory.resultIndex, result)
                     }
                 }
                 break

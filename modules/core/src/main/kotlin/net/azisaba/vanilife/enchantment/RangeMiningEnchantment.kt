@@ -1,77 +1,73 @@
 package net.azisaba.vanilife.enchantment
 
+import com.tksimeji.gonunne.enchantment.CustomEnchantment
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffectEvent
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffects
+import com.tksimeji.gonunne.enchantment.getEnchantmentLevel
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys
 import io.papermc.paper.registry.tag.TagKey
-import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.PLUGIN_ID
 import net.azisaba.vanilife.registry.CustomEnchantments
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
 import org.bukkit.Location
-import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.EquipmentSlotGroup
 import org.bukkit.inventory.ItemType
 
-object RangeMiningEnchantment: ToolEnchantment {
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "range_mining")
+object RangeMiningEnchantment: CustomEnchantment {
+    override val key: Key = Key.key(PLUGIN_ID, "range_mining")
 
-    override val displayName: Component
-        get() = Component.translatable("enchantment.vanilife.range_mining")
+    override val displayName: Component = Component.translatable("enchantment.vanilife.range_mining")
 
-    override val maximumLevel: Int
-        get() = 2
+    override val maxLevel: Int = 2
 
-    override val maximumCost: EnchantmentRegistryEntry.EnchantmentCost
-        get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 1)
+    override val maxCost: EnchantmentRegistryEntry.EnchantmentCost = EnchantmentRegistryEntry.EnchantmentCost.of(1, 1)
 
-    override val minimumCost: EnchantmentRegistryEntry.EnchantmentCost
-        get() = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
+    override val minCost: EnchantmentRegistryEntry.EnchantmentCost = EnchantmentRegistryEntry.EnchantmentCost.of(1, 3)
 
-    override val anvilCost: Int
-        get() = 1
+    override val anvilCost: Int = 8
 
-    override val supportedItems: TagKey<ItemType>
-        get() = ItemTypeTagKeys.PICKAXES
+    override val enchantingTableWeight: Int = 1
 
-    override val exclusives: Set<Keyed>
-        get() = setOf(CustomEnchantments.BULK_MINING)
+    override val activeSlots: Set<EquipmentSlotGroup> = setOf(EquipmentSlotGroup.MAINHAND)
 
-    override fun use(player: Player, blocks: MutableSet<Block>, itemStack: ItemStack, enchantment: Enchantment) {
-        if (blocks.size != 1) {
-            return
-        }
+    override val exclusiveSet: Set<Keyed> = setOf(CustomEnchantments.BULK_MINING)
 
-        val block = blocks.first()
+    override val supportedItems: TagKey<ItemType> = ItemTypeTagKeys.PICKAXES
 
-        val range = when (itemStack.getEnchantmentLevel(enchantment)) {
-            1 -> {
-                blocks.add(block.getRelative(BlockFace.DOWN))
-                return
+    override val effects = EnchantmentEffects.create()
+        .add(EnchantmentEffectEvent.BREAK_BLOCK) { ctx ->
+            val blocks = ctx.blocks
+            val block = blocks.firstOrNull() ?: return@add
+            val itemStack = ctx.itemStack
+
+            val range = when (itemStack.getEnchantmentLevel(this)) {
+                1 -> {
+                    blocks.add(block.getRelative(BlockFace.DOWN))
+                    return@add
+                }
+                else -> itemStack.getEnchantmentLevel(this)
             }
-            else -> itemStack.getEnchantmentLevel(enchantment)
-        }
 
-        val pos1 = Location(block.world,
-            block.x - (if (range % 2 != 0) range / 2 else range - 1).toDouble(),
-            block.y - (if (range % 2 != 0) range / 2 else range - 1).toDouble(),
-            block.z - (if (range % 2 != 0) range / 2 else range - 1).toDouble())
+            val pos1 = Location(block.world,
+                block.x - (if (range % 2 != 0) range / 2 else range - 1).toDouble(),
+                block.y - (if (range % 2 != 0) range / 2 else range - 1).toDouble(),
+                block.z - (if (range % 2 != 0) range / 2 else range - 1).toDouble())
 
-        val pos2 = Location(block.world,
-            block.x + (if (range % 2 != 0) range / 2 else 0).toDouble(),
-            block.y + (if (range % 2 != 0) range / 2 else 0).toDouble(),
-            block.z + (if (range % 2 != 0) range / 2 else 0).toDouble())
+            val pos2 = Location(block.world,
+                block.x + (if (range % 2 != 0) range / 2 else 0).toDouble(),
+                block.y + (if (range % 2 != 0) range / 2 else 0).toDouble(),
+                block.z + (if (range % 2 != 0) range / 2 else 0).toDouble())
 
-        for (x in pos1.blockX..pos2.blockX) {
-            for (y in pos1.blockY..pos2.blockY) {
-                for (z in pos1.blockZ..pos2.blockZ) {
-                    blocks.add(block.world.getBlockAt(x, y, z))
+            for (x in pos1.blockX..pos2.blockX) {
+                for (y in pos1.blockY..pos2.blockY) {
+                    for (z in pos1.blockZ..pos2.blockZ) {
+                        blocks.add(block.world.getBlockAt(x, y, z))
+                    }
                 }
             }
         }
-    }
 }

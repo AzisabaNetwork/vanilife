@@ -1,12 +1,14 @@
 package net.azisaba.vanilife.listener
 
-import net.azisaba.vanilife.enchantment.ToolEnchantment
-import net.azisaba.vanilife.extension.customEnchantment
-import net.azisaba.vanilife.extension.toPaperEnchantment
+import com.tksimeji.gonunne.enchantment.context.BlockBreakContext
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffectEvent
+import com.tksimeji.gonunne.enchantment.effect.EnchantmentEffects
+import net.azisaba.vanilife.extensions.customEnchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.inventory.EquipmentSlot
 
 object CustomEnchantmentListener: Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -14,9 +16,7 @@ object CustomEnchantmentListener: Listener {
         val player = event.player
 
         val itemStack = player.inventory.itemInMainHand
-        val customEnchantments = itemStack.enchantments
-            .mapNotNull { it.key.customEnchantment as? ToolEnchantment }
-            .sortedBy { it.usePriority }
+        val customEnchantments = itemStack.enchantments.mapNotNull { it.key.customEnchantment() }.toSet()
 
         if (customEnchantments.isEmpty()) {
             return
@@ -26,9 +26,7 @@ object CustomEnchantmentListener: Listener {
 
         val blocks = mutableSetOf(event.block)
 
-        for (customEnchantment in customEnchantments) {
-            customEnchantment.use(player, blocks, itemStack, customEnchantment.toPaperEnchantment())
-        }
+        EnchantmentEffects.call(EnchantmentEffectEvent.BREAK_BLOCK, BlockBreakContext.create(player, itemStack, EquipmentSlot.HAND, blocks), customEnchantments)
 
         for (block in blocks) {
             block.breakNaturally(itemStack)

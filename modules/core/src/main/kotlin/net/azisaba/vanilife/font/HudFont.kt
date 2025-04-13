@@ -1,11 +1,12 @@
 package net.azisaba.vanilife.font
 
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.registry.Registry
+import com.tksimeji.gonunne.font.Font
+import com.tksimeji.gonunne.registry.impl.RegistryImpl
+import net.azisaba.vanilife.PLUGIN_ID
 import net.kyori.adventure.key.Key
 
-object HudFont: Registry<String, Char>(), Font {
-    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "hud")
+object HudFont: RegistryImpl<String, Char>(), Font {
+    override val key: Key = Key.key(PLUGIN_ID, "hud")
 
     val LEVEL_BLUE = register("level_blue", '\uE001')
     

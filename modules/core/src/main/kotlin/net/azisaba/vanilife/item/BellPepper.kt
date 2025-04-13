@@ -1,26 +1,25 @@
 package net.azisaba.vanilife.item
 
-import net.azisaba.vanilife.Season
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.registry.ItemGroups
+import com.tksimeji.gonunne.Season
+import com.tksimeji.gonunne.item.Seasonal
+import com.tksimeji.gonunne.item.Vegetable
+import net.azisaba.vanilife.PLUGIN_ID
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemType
 
 object BellPepper: Seasonal, Vegetable {
-    override val key: Key = Key.key(Vanilife.PLUGIN_ID, "bell_pepper")
+    override val key: Key = Key.key(PLUGIN_ID, "bell_pepper")
 
     override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key = Key.key(Vanilife.PLUGIN_ID, "bell_pepper")
+    override val itemModel: Key = Key.key(PLUGIN_ID, "bell_pepper")
 
     override val displayName: Component = Component.translatable("item.vanilife.bell_pepper")
-
-    override val group: ItemGroup = ItemGroups.VEGETABLE
 
     override val season: Set<Season> = setOf(Season.SUMMER)
 
     override val nutrition: Int = 3
 
-    override val saturation: Float = 1.5F
+    override val saturation: Float = 1.5f
 }

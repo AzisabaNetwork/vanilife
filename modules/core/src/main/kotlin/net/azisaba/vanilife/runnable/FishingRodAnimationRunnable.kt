@@ -4,9 +4,9 @@ import com.github.retrooper.packetevents.util.Vector3d
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityRelativeMoveAndRotation
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity
-import net.azisaba.vanilife.extension.sendPacketSilently
-import net.azisaba.vanilife.extension.toPacketEventsEntityType
-import net.azisaba.vanilife.extension.toPacketEventsLocation
+import com.tksimeji.gonunne.network.sendPacketSilently
+import com.tksimeji.gonunne.network.toPacketEventsEntityType
+import com.tksimeji.gonunne.network.toPacketEventsLocation
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Material

@@ -1,13 +1,12 @@
 package net.azisaba.vanilife.item
 
-import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.extension.createItemStack
-import net.azisaba.vanilife.registry.ItemGroups
+import com.tksimeji.gonunne.item.Priced
+import com.tksimeji.gonunne.item.createItemStack
+import net.azisaba.vanilife.PLUGIN_ID
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
-import org.jetbrains.annotations.Range
 
 class Money private constructor(override val price: Int): Priced {
     companion object {
@@ -64,20 +63,13 @@ class Money private constructor(override val price: Int): Priced {
         }
     }
 
-    override val key: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "money_$price")
+    override val key: Key = Key.key(PLUGIN_ID, "money_$price")
 
-    override val itemType: ItemType
-        get() = ItemType.STICK
+    override val itemType: ItemType = ItemType.STICK
 
-    override val itemModel: Key
-        get() = Key.key(Vanilife.PLUGIN_ID, "money_$price")
+    override val itemModel: Key = Key.key(PLUGIN_ID, "money_$price")
 
-    override val displayName: Component
-        get() = Component.translatable("item.vanilife.money", Component.text(price))
+    override val displayName: Component = Component.translatable("item.vanilife.money", Component.text(price))
 
-    override val group: ItemGroup = ItemGroups.MONEY
-
-    override val maxStackSize: @Range(from = 1, to = 99) Int
-        get() = 99
+    override val maxStackSize: Int = 99
 }

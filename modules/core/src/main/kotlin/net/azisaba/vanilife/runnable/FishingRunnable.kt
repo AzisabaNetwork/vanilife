@@ -1,8 +1,8 @@
 package net.azisaba.vanilife.runnable
 
+import com.tksimeji.gonunne.fishing.FishingEntry
 import net.azisaba.vanilife.Vanilife
-import net.azisaba.vanilife.fish.Fish
-import net.azisaba.vanilife.registry.Fishes
+import net.azisaba.vanilife.registry.FishingEntries
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
 import org.bukkit.enchantments.Enchantment
@@ -26,7 +26,7 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
     val entity: Entity
         get() = bobbingVehicle ?: hook
 
-    var fish: Fish? = null
+    var fishingEntry: FishingEntry? = null
 
     var bobbingVehicle: Snowball? = null
 
@@ -54,10 +54,10 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
         updateWaitTime()
         updateBobbingVehicle()
 
-        fish?.tick(player, hook, tickNumber, noiseGenerator)
+        fishingEntry?.tick(player, hook, tickNumber, noiseGenerator)
         tickNumber++
 
-        if (waitTime < 0 && fish == null) {
+        if (waitTime < 0 && fishingEntry == null) {
             bite()
         }
     }
@@ -70,21 +70,11 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
     }
 
     private fun bite() {
-        val totalWeight = Fishes.sumOf { it.lootWeight }
-        val random = Random.nextInt(totalWeight)
-        var cumulativeWeight = 0
-
-        for (fish in Fishes) {
-            cumulativeWeight += fish.lootWeight
-            if (random < cumulativeWeight) {
-                this.fish = fish
-                return
-            }
-        }
+        this.fishingEntry = FishingEntries.random()
     }
 
     internal fun caught() {
-        val fish = fish ?: throw IllegalStateException("No fish found")
+        val fish = fishingEntry ?: throw IllegalStateException("No fish found")
 
         for (itemStack in fish.loot(player, hook)) {
             val itemEntity = hook.world.createEntity(hook.location, Item::class.java).apply {
@@ -137,7 +127,7 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
     }
 
     private fun updateWaitTime() {
-        if (fish != null || (hook.state != FishHook.HookState.BOBBING && bobbingVehicle == null)) {
+        if (fishingEntry != null || (hook.state != FishHook.HookState.BOBBING && bobbingVehicle == null)) {
             return
         }
 
