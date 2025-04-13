@@ -26,7 +26,7 @@ allprojects {
     dependencies {
         compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
         compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
-        compileOnly("com.tksimeji:kunectron:1.0.0-beta.6")
+        compileOnly("com.tksimeji:kunectron:1.0.0-beta.7")
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         implementation("com.charleskorn.kaml:kaml:0.73.0")
     }

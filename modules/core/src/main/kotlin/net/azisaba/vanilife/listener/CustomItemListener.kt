@@ -27,7 +27,7 @@ object CustomItemListener: Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val itemStack = event.item
         itemStack?.customItemType()?.use(event.player, event.action, event.clickedBlock, event.blockFace)

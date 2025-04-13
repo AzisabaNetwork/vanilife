@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component
 object ToolGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "tool")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.KNIFE.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.KNIFE.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.tool")
 

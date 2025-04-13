@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component
 object FruitGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "fruit")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.STRAWBERRY.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.STRAWBERRY.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.fruit")
 

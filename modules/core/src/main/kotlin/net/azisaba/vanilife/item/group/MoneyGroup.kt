@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component
 object MoneyGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "money")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.MONEY_10000.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.MONEY_10000.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.money")
 

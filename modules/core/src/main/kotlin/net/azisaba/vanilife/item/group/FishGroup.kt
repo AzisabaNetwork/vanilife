@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component
 object FishGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "fish")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.CRUCIAN_CARP.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.CRUCIAN_CARP.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.fish")
 

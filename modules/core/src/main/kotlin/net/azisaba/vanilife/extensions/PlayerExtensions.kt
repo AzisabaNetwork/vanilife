@@ -2,6 +2,9 @@ package net.azisaba.vanilife.extensions
 
 import com.tksimeji.gonunne.component.plainText
 import com.tksimeji.gonunne.font.font
+import com.tksimeji.gonunne.key.toNamespacedKey
+import com.tksimeji.kunectron.builder.GuiBuilder
+import net.azisaba.vanilife.PLUGIN_ID
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.font.DialogueFirstLineFont
 import net.azisaba.vanilife.font.DialogueSecondLineFont
@@ -9,12 +12,14 @@ import net.azisaba.vanilife.font.HudFont
 import net.azisaba.vanilife.font.TitleFont
 import net.azisaba.vanilife.item.Money
 import net.azisaba.vanilife.util.runTaskTimerAsync
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.ShadowColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.translation.GlobalTranslator
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
@@ -23,8 +28,6 @@ import java.time.Duration
 import java.util.*
 
 private val DATABASE_CACHE_LEVEL = mutableMapOf<UUID, Int>()
-// private val DATABASE_CACHE_CHAPTER = mutableMapOf<Pair<UUID, Chapter>, Boolean>()
-// private val DATABASE_CACHE_OBJECTIVE = mutableMapOf<Pair<UUID, Objective>, Boolean>()
 
 var OfflinePlayer.lv: Int
     get() {
@@ -196,124 +199,9 @@ fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Cha
     }
 }
 
-/* fun OfflinePlayer.grantChapter(chapter: Chapter) {
-    val cacheKey = Pair(uniqueId, chapter)
-
-    if (DATABASE_CACHE_CHAPTER[cacheKey] == true || hasChapter(chapter)) {
-        return
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER_CHAPTER} VALUES (?, ?)").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, chapter.key.asString())
-            preparedStatement.executeUpdate()
-        }
-    }
-
-    DATABASE_CACHE_CHAPTER[cacheKey] = true
+fun Player.showInfoToast(message: Component) {
+    GuiBuilder.advancementToast()
+        .icon(ItemStack.of(Material.STICK).apply { itemMeta = itemMeta.apply { itemModel = Key.key(PLUGIN_ID, "info").toNamespacedKey() } })
+        .message(message)
+        .build(this)
 }
-
-fun OfflinePlayer.revokeChapter(chapter: Chapter) {
-    val cacheKey = Pair(uniqueId, chapter)
-
-    if (DATABASE_CACHE_CHAPTER[cacheKey] == false || !hasChapter(chapter)) {
-        return
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("DELETE FROM ${Vanilife.DATABASE_PLAYER_CHAPTER} WHERE player = ? AND chapter = ?").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, chapter.key.asString())
-            preparedStatement.executeUpdate()
-        }
-    }
-
-    DATABASE_CACHE_CHAPTER[cacheKey] = false
-}
-
-fun OfflinePlayer.hasChapter(chapter: Chapter): Boolean {
-    val cacheKey = Pair(uniqueId, chapter)
-    val cache = DATABASE_CACHE_CHAPTER[cacheKey]
-
-    if (cache != null) {
-        return cache
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("SELECT 1 FROM ${Vanilife.DATABASE_PLAYER_CHAPTER} WHERE player = ? AND chapter = ?").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, chapter.key.asString())
-            preparedStatement.executeQuery().use { resultSet ->
-                val exists = resultSet.next()
-                DATABASE_CACHE_CHAPTER[cacheKey] = exists
-                return exists
-            }
-        }
-    }
-}
-
-fun OfflinePlayer.grantObjective(objective: Objective) {
-    val cacheKey = Pair(uniqueId, objective)
-
-    if (DATABASE_CACHE_OBJECTIVE[cacheKey] == true || hasObjective(objective)) {
-        return
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("INSERT INTO ${Vanilife.DATABASE_PLAYER_OBJECTIVE} VALUES (?, ?)").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, objective.key.asString())
-            preparedStatement.executeUpdate()
-        }
-    }
-
-    DATABASE_CACHE_OBJECTIVE[cacheKey] = true
-
-    if (this is Player) {
-        objective.onAchieve(this)
-        val chapter = objective.chapter
-        if (chapter.all { hasObjective(it) }) {
-            chapter.onAchieve(this)
-        }
-    }
-}
-
-fun OfflinePlayer.revokeObjective(objective: Objective) {
-    val cacheKey = Pair(uniqueId, objective)
-
-    if (DATABASE_CACHE_OBJECTIVE[cacheKey] == false || !hasObjective(objective)) {
-        return
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("DELETE FROM ${Vanilife.DATABASE_PLAYER_OBJECTIVE} WHERE player = ? AND objective = ?").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, objective.key.asString())
-            preparedStatement.executeUpdate()
-        }
-    }
-
-    DATABASE_CACHE_OBJECTIVE[cacheKey] = false
-}
-
-fun OfflinePlayer.hasObjective(objective: Objective): Boolean {
-    val cacheKey = Pair(uniqueId, objective)
-    val cache = DATABASE_CACHE_OBJECTIVE[cacheKey]
-
-    if (cache != null) {
-        return cache
-    }
-
-    Vanilife.dataSource.connection.use { connection ->
-        connection.prepareStatement("SELECT 1 FROM ${Vanilife.DATABASE_PLAYER_OBJECTIVE} WHERE player = ? AND objective = ?").use { preparedStatement ->
-            preparedStatement.setString(1, uniqueId.toString())
-            preparedStatement.setString(2, objective.key.asString())
-            preparedStatement.executeQuery().use { resultSet ->
-                val exists = resultSet.next()
-                DATABASE_CACHE_OBJECTIVE[cacheKey] = exists
-                return exists
-            }
-        }
-    }
-} */

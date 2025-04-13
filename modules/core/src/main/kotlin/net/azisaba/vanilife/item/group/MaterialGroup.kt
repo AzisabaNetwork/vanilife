@@ -14,11 +14,13 @@ import net.kyori.adventure.text.Component
 object MaterialGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "material")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.MAGNITE.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.MAGNITE.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.material")
 
     val CAVENIUM = register(CustomItemTypes.CAVENIUM)
 
     val MAGNITE = register(CustomItemTypes.MAGNITE)
+
+    val REFINED_MAGMA_CREAM = register(CustomItemTypes.REFINED_MAGMA_CREAM)
 }

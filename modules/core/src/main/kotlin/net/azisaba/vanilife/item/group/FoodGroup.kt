@@ -14,7 +14,7 @@ import net.kyori.adventure.text.Component
 object FoodGroup: KeyedRegistryImpl<CustomItemType>(), ItemGroup {
     override val key: Key = Key.key(PLUGIN_ID, "food")
 
-    override val icon: ItemElement = Element.item(CustomItemTypes.SANDWICH.createItemStack())
+    override val icon: ItemElement = Element.item(CustomItemTypes.SANDWICH.createItemStack()).hideAdditionalTooltip(true)
 
     override val title: Component = Component.translatable("itemGroup.vanilife.food")
 
