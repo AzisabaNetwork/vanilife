@@ -7,8 +7,8 @@ dependencies {
     implementation(project(":modules:api"))
     implementation(project(":modules:v1_21_4"))
     implementation(project(":modules:v1_21_x"))
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
     implementation("com.zaxxer:HikariCP:6.2.1")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
 }
 
 tasks.processResources {
