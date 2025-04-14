@@ -2,6 +2,7 @@ package net.azisaba.vanilife.runnable
 
 import com.tksimeji.gonunne.fishing.FishingEntry
 import net.azisaba.vanilife.Vanilife
+import net.azisaba.vanilife.event.FishHookLandEvent
 import net.azisaba.vanilife.registry.FishingEntries
 import org.bukkit.Fluid
 import org.bukkit.block.BlockFace
@@ -38,6 +39,8 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
 
     private val noiseGenerator = SimplexNoiseGenerator(hook.world.seed * System.currentTimeMillis())
 
+    private var eventCalled = false
+
     init {
         instances.add(this)
         waitTime -= fishingRod.getEnchantmentLevel(Enchantment.LURE) * 5
@@ -47,6 +50,12 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
         if (hook.isDead) {
             cancel()
             return
+        }
+
+        if (!eventCalled && hook.state == FishHook.HookState.BOBBING) {
+            val fluidData = hook.world.getFluidData(hook.location)
+            FishHookLandEvent(hook, player, fluidData, fishingRod)
+            eventCalled = true
         }
 
         hook.resetFishingState()
@@ -109,6 +118,11 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
         } else {
             if (bobbingVehicle?.isDead == true) {
                 bobbingVehicle = null
+            }
+
+            if (!eventCalled) {
+                FishHookLandEvent(hook, player, fluidData, fishingRod).callEvent()
+                eventCalled = true
             }
 
             val bobbingVehicle = bobbingVehicle ?: hookLocation.world.spawn(hookLocation.add(0.0, -0.25, 0.0), Snowball::class.java).apply {
