@@ -1,13 +1,17 @@
 package net.azisaba.vanilife.listener
 
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import com.tksimeji.gonunne.item.Combinable
 import net.azisaba.vanilife.extensions.customItemType
 import net.azisaba.vanilife.extensions.hasCustomItemType
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.inventory.InventoryAction
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.CraftingRecipe
 
@@ -25,6 +29,27 @@ object CustomItemListener: Listener {
             event.isCancelled = true
             event.inventory.result = null
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onInventoryClick(event: InventoryClickEvent) {
+        if (event.action != InventoryAction.SWAP_WITH_CURSOR) {
+            return
+        }
+
+        val player = event.whoClicked as? Player ?: return
+
+        val inventoryItemStack = event.currentItem ?: return
+        val cursorItemStack = event.cursor
+
+        val customItemType = cursorItemStack.customItemType() as? Combinable ?: return
+        if (!customItemType.canCombine(inventoryItemStack)) {
+            return
+        }
+        customItemType.combine(player, cursorItemStack, inventoryItemStack)
+
+        event.isCancelled = true
+        player.setItemOnCursor(null)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

@@ -3,10 +3,7 @@ package net.azisaba.vanilife.listener
 import com.tksimeji.gonunne.world.distance2D
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.event.FishHookLandEvent
-import net.azisaba.vanilife.extensions.customItemType
-import net.azisaba.vanilife.extensions.focusHotbarSlot
-import net.azisaba.vanilife.extensions.focusItemStack
-import net.azisaba.vanilife.extensions.showDialogue
+import net.azisaba.vanilife.extensions.*
 import net.azisaba.vanilife.item.FireproofReelRecipe
 import net.azisaba.vanilife.registry.CustomItemTypes
 import net.azisaba.vanilife.runnable.FishingHudRunnable
@@ -81,13 +78,14 @@ object FishingListener: Listener {
 
     @EventHandler
     fun onFishHookLand(event: FishHookLandEvent) {
-        if (event.fluidData.fluidType != Fluid.LAVA) {
+        val fishingRod = event.fishingRod
+
+        if (event.fluidData.fluidType != Fluid.LAVA || fishingRod.reel() == CustomItemTypes.FIREPROOF_REEL) {
             return
         }
 
         val hook = event.hook
         val player = event.player
-        val fishingRod = event.fishingRod
 
         runTaskTimer(0, 1) {
             val damageable = fishingRod.itemMeta as Damageable

@@ -16,7 +16,8 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
 abstract class MysteriousRecipe(hint: Component, private val actualRecipeTitle: Component): Recipe(OBFUSCATED_RECIPE_TITLE) {
-    override val lore: List<Component> = listOf(Component.translatable("item.vanilife.mysterious_recipe.hint").color(NamedTextColor.WHITE)
+    override val lore: List<Component> = listOf(
+        Component.translatable("item.vanilife.mysterious_recipe.hint").color(NamedTextColor.WHITE)
         .append(Component.text(": ").color(NamedTextColor.GRAY))
         .append(hint.colorIfAbsent(NamedTextColor.DARK_GRAY)))
 
@@ -45,7 +46,8 @@ abstract class MysteriousRecipe(hint: Component, private val actualRecipeTitle: 
     }
 
     fun isLocked(itemStack: ItemStack): Boolean {
-        return itemStack.persistentDataContainer.getOrDefault(KEY_LOCKED.toNamespacedKey(), PersistentDataType.BOOLEAN, true)
+        return itemStack.persistentDataContainer.getOrDefault(KEY_LOCKED.toNamespacedKey(),
+            PersistentDataType.BOOLEAN, true)
     }
 
     companion object {

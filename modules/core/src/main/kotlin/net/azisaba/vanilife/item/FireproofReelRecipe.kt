@@ -2,6 +2,7 @@ package net.azisaba.vanilife.item
 
 import net.azisaba.vanilife.PLUGIN_ID
 import net.azisaba.vanilife.extensions.showDialogue
+import net.azisaba.vanilife.registry.CustomRecipes
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -11,6 +12,7 @@ object FireproofReelRecipe: MysteriousRecipe(Component.translatable("item.vanili
 
     override fun learn(player: Player) {
         player.showDialogue(Component.translatable("item.vanilife.fireproof_reel_recipe.use"))
+        player.discoverRecipe(CustomRecipes.FIREPROOF_REEL.key)
         player.inventory.setItemInMainHand(null)
     }
 }

@@ -48,6 +48,13 @@ object CustomRecipes: RegistryImpl<Key, Recipe>() {
         addIngredient(CustomItemTypes.WHEAT_FLOUR.createItemStack())
     })
 
+    val FIREPROOF_REEL = register(ShapedRecipe(Key.key(PLUGIN_ID, "fireproof_reel").toNamespacedKey(), CustomItemTypes.FIREPROOF_REEL.createItemStack()).apply {
+        shape("MIM", "MSM", "MMM")
+        setIngredient('M', CustomItemTypes.REFINED_MAGMA_CREAM.createItemStack())
+        setIngredient('I', Material.IRON_INGOT)
+        setIngredient('S', Material.STRING)
+    })
+
     val FRUIT_SANDWICH = registerSandwichRecipes("sruit_sandwich", CustomItemTypes.FRUIT_SANDWICH, CustomItemTypes.filterIsInstance<Fruit>())
 
     val KNIFE = register(ShapedRecipe(Key.key(PLUGIN_ID, "knife").toNamespacedKey(), CustomItemTypes.KNIFE.createItemStack()).apply {

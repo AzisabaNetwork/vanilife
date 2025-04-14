@@ -4,11 +4,13 @@ import com.tksimeji.gonunne.item.CustomItemType
 import com.tksimeji.gonunne.registry.impl.RegistryImpl
 
 internal object ItemStackBuilders: RegistryImpl<Class<out CustomItemType>, ItemStackBuilder<*>>() {
-    internal val CONSUMABLE = register(ConsumableBuilder)
+    val COMBINABLE = register(CombinableBuilder)
 
-    internal val FOOD = register(FoodBuilder)
+    val CONSUMABLE = register(ConsumableBuilder)
 
-    internal val SEASONAL = register(SeasonalBuilder)
+    val FOOD = register(FoodBuilder)
+
+    val SEASONAL = register(SeasonalBuilder)
 
     private fun <T: ItemStackBuilder<*>> register(creator: T): T {
         return register(creator.clazz, creator)

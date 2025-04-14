@@ -18,6 +18,7 @@ object CustomItemTypes: KeyedRegistryImpl<CustomItemType>() {
     val CUCUMBER = register(Cucumber)
     val DOUGH = register(Dough)
     val EGGPLANT = register(Eggplant)
+    val FIREPROOF_REEL = register(FireproofReel)
     val FIREPROOF_REEL_RECIPE = register(FireproofReelRecipe)
     val FRUIT_SANDWICH = register(FruitSandwich)
     val GRAPE = register(Grape)

@@ -1,10 +1,10 @@
 package com.tksimeji.gonunne.item.builder
 
 import com.tksimeji.gonunne.component.plainText
+import com.tksimeji.gonunne.component.resetStyle
 import com.tksimeji.gonunne.item.Seasonal
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.inventory.ItemStack
 
 internal object SeasonalBuilder: ItemStackBuilder<Seasonal> {
@@ -21,10 +21,7 @@ internal object SeasonalBuilder: ItemStackBuilder<Seasonal> {
         }
 
         val lore = itemStack.lore() ?: mutableListOf()
-        lore.add(Component.translatable("season.seasonal").color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)
-            .append(Component.text(": ").color(NamedTextColor.GRAY))
-            .append(builder))
-
+        lore.add(Component.translatable("item.gonunne.seasonal.description", builder).color(NamedTextColor.GRAY).resetStyle())
         itemStack.apply { itemMeta = itemMeta.apply { lore(lore) } }
     }
 }
