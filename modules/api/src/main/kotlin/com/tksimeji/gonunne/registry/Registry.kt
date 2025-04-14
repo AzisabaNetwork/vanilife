@@ -1,6 +1,6 @@
 package com.tksimeji.gonunne.registry
 
-interface Registry<K, V>: Iterable<V> {
+interface Registry<K, V>: Collection<V> {
     val values: List<V>
 
     fun get(key: K): V?

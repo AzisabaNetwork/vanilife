@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemRarity
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 
 interface CustomItemType: Keyed {
@@ -39,6 +40,6 @@ interface CustomItemType: Keyed {
     fun onInOffHand(player: Player) {
     }
 
-    fun use(player: Player, action: Action, block: Block?, blockFace: BlockFace) {
+    fun use(itemStack: ItemStack, player: Player, action: Action, block: Block?, face: BlockFace) {
     }
 }

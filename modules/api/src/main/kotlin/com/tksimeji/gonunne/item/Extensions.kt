@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ItemType
 import org.bukkit.persistence.PersistentDataType
@@ -24,7 +25,10 @@ fun CustomItemType.createItemStack(amount: Int = 1): ItemStack {
 
     itemModel?.let { itemMeta.itemModel = it.toNamespacedKey() }
     if (maxStackSize != itemType.maxStackSize) itemMeta.setMaxStackSize(maxStackSize)
-    if (enchantmentAura) itemMeta.addEnchant(Enchantment.INFINITY, 1, false)
+    if (enchantmentAura) {
+        itemMeta.addEnchant(Enchantment.INFINITY, 1, false)
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+    }
 
     itemStack.itemMeta = itemMeta
 

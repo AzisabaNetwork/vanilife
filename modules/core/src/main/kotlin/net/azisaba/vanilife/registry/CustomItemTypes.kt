@@ -34,6 +34,7 @@ object CustomItemTypes: KeyedRegistryImpl<CustomItemType>() {
     val ONION = register(Onion)
     val PACIFIC_SAURY = register(PacificSaury)
     val PEACH = register(Peach)
+    val REFINED_MAGMA_CREAM = register(RefinedMagmaCream)
     val ROCK_SALT = register(RockSalt)
     val SALT = register(Salt)
     val SANDWICH = register(Sandwich)

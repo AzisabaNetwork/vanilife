@@ -30,7 +30,7 @@ object CustomItemListener: Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val itemStack = event.item
-        itemStack?.customItemType()?.use(event.player, event.action, event.clickedBlock, event.blockFace)
+        itemStack?.customItemType()?.use(itemStack, event.player, event.action, event.clickedBlock, event.blockFace)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

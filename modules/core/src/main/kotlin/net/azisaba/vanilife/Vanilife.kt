@@ -14,6 +14,7 @@ import net.azisaba.vanilife.listener.*
 import net.azisaba.vanilife.registry.CustomBiomes
 import net.azisaba.vanilife.registry.CustomRecipes
 import net.azisaba.vanilife.registry.LanguageBundles
+import net.azisaba.vanilife.registry.PotionMixes
 import net.azisaba.vanilife.runnable.FishingHudRunnable
 import net.azisaba.vanilife.runnable.HudRunnable
 import net.azisaba.vanilife.util.createTableIfNotExists
@@ -109,6 +110,8 @@ class Vanilife : JavaPlugin() {
             translationRegistry.registerAll(locale, bundle, true)
         }
         GlobalTranslator.translator().addSource(translationRegistry)
+
+        adapter.registerPotionMixes(PotionMixes)
 
         PacketEvents.getAPI().init()
 

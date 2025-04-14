@@ -6,6 +6,9 @@ abstract class RegistryImpl<K, V>: Registry<K, V> {
     override val values: List<V>
         get() = map.values.toList()
 
+    override val size: Int
+        get() = map.size
+
     private val map = mutableMapOf<K, V>()
 
     override fun get(key: K): V? {
@@ -29,11 +32,28 @@ abstract class RegistryImpl<K, V>: Registry<K, V> {
         return value.also { map.remove(key) }
     }
 
+    override fun contains(element: V): Boolean {
+        return map.containsValue(element)
+    }
+
+    override fun containsAll(elements: Collection<V>): Boolean {
+        for (element in elements) {
+            if (!contains(element)) {
+                return false
+            }
+        }
+        return true
+    }
+
     override fun iterator(): Iterator<V> {
         return values.iterator()
     }
 
     override fun toMap(): Map<K, V> {
         return map.toMap()
+    }
+
+    override fun isEmpty(): Boolean {
+        return map.isEmpty()
     }
 }
