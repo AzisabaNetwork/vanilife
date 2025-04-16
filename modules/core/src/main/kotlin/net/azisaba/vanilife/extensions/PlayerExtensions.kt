@@ -2,18 +2,15 @@ package net.azisaba.vanilife.extensions
 
 import com.tksimeji.gonunne.component.plainText
 import com.tksimeji.gonunne.font.font
-import com.tksimeji.gonunne.key.toNamespacedKey
-import com.tksimeji.kunectron.builder.GuiBuilder
-import net.azisaba.vanilife.PLUGIN_ID
 import net.azisaba.vanilife.Vanilife
 import net.azisaba.vanilife.font.DialogueFirstLineFont
 import net.azisaba.vanilife.font.DialogueSecondLineFont
 import net.azisaba.vanilife.font.HudFont
 import net.azisaba.vanilife.font.TitleFont
 import net.azisaba.vanilife.item.Money
+import net.azisaba.vanilife.util.runTaskLaterAsync
 import net.azisaba.vanilife.util.runTaskTimer
 import net.azisaba.vanilife.util.runTaskTimerAsync
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.ShadowColor
@@ -21,13 +18,14 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.translation.GlobalTranslator
-import org.bukkit.Material
 import org.bukkit.OfflinePlayer
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
 import java.time.Duration
 import java.util.*
+import kotlin.random.Random
 
 private val DATABASE_CACHE_LEVEL = mutableMapOf<UUID, Int>()
 
@@ -140,71 +138,91 @@ fun Player.sendFishingHud(distance: Double, cps: Int) {
         .append(Component.text(cps.toString().padStart(2, '0'))))
 }
 
-fun Player.showDialogue(component: Component, also: () -> Unit = {}) {
+fun Player.showDialogue(component: Component, background: Char = TitleFont.DIALOGUE, also: () -> Unit = {}) {
     val string = GlobalTranslator.render(component, locale()).plainText()
-
     if (string.length <= 36) {
-        showDialogue(component, Component.empty(), also = also)
+        showDialogue(component, Component.empty(), background, also)
         return
     }
 
     val separators = setOf('.', ',', '。', '、')
-
-    val substring = string.substring(0, 36)
+    val substring = string.take(36)
     var splitIndex = -1
 
-    for (i in substring.length - 1 downTo  0) {
+    for (i in substring.length - 1 downTo 0) {
         if (substring[i] in separators) {
             splitIndex = i
             break
         }
     }
 
-    val firstLine = Component.text(if (splitIndex != -1) string.substring(0, splitIndex + 1) else string.substring(0, 36))
-    val secondLine = Component.text(if (splitIndex != -1) string.substring(splitIndex + 1)  else string.substring(36))
-    showDialogue(firstLine, secondLine, also = also)
+    val firstLine = Component.text(if (splitIndex != -1) string.substring(0, splitIndex + 1) else string.take(36))
+    val secondLine = Component.text(if (splitIndex != -1) string.substring(splitIndex + 1) else string.drop(36))
+    showDialogue(firstLine, secondLine, background, also)
 }
 
-fun Player.showDialogue(firstLine: Component, secondLine: Component, space2: Char = DialogueFirstLineFont.SPACE_2, space4: Char = DialogueFirstLineFont.SPACE_4, also: () -> Unit = {}) {
-    fun build(string: String): String {
+fun Player.showDialogue(firstLine: Component, secondLine: Component, background: Char = TitleFont.DIALOGUE, also: () -> Unit = {}) {
+    val firstLineString = GlobalTranslator.render(firstLine, locale()).plainText()
+    val secondLineString = GlobalTranslator.render(secondLine, locale()).plainText()
+
+    var tick = 0
+
+    runTaskTimerAsync(0, 2) {
+        val typewriterEffect = typewriterEffect(firstLineString, secondLineString, tick)
+        playSound(this, Sound.BLOCK_NOTE_BLOCK_BIT, 0.8f, 1.6f + Random.nextFloat() * (2f - 1.6f))
+        showDialogueDirect(typewriterEffect.first, typewriterEffect.second, background)
+        tick++
+        val b = typewriterEffect != Pair(firstLineString, secondLineString)
+        if (!b) runTaskLaterAsync(30) { also() }
+        return@runTaskTimerAsync b
+    }
+}
+
+fun Player.showCharacterDialogue(component: Component, characterBackground: Char, also: () -> Unit = {}) {
+    val space = " ".repeat(12)
+    showDialogue(Component.text(space).append(component), characterBackground, also)
+}
+
+fun Player.showCharacterDialogue(firstLine: Component, secondLine: Component, characterBackground: Char, also: () -> Unit = {}) {
+    val space = " ".repeat(12)
+    showDialogue(Component.text(space).append(firstLine), Component.text(space).append(secondLine), characterBackground, also)
+}
+
+private fun Player.showDialogueDirect(firstLine: String, secondLine: String, background: Char) {
+    fun buildLine(string: String): String {
         val width = string.sumOf { if (it.code in 0x00..0x7F) 2 else 4.toInt() }
         val remaining = 4 * 32 - width
         return if (remaining <= 0) {
             string
         } else {
-            string + space4.toString().repeat(remaining / 4) + if (remaining % 4 == 2) space2 else ""
+            string + DialogueFirstLineFont.SPACE_4.toString().repeat(remaining / 4) + if (remaining % 4 == 2) DialogueFirstLineFont.SPACE_2 else ""
         }
     }
 
-    val firstLineRaw = GlobalTranslator.render(firstLine, locale()).plainText()
-    val secondLineRaw = GlobalTranslator.render(secondLine, locale()).plainText()
-
-    var x = 0
-    var y = 0
-    runTaskTimerAsync(0, 2) {
-        val title = Component.text(TitleFont.DIALOGUE).font(TitleFont).shadowColor(ShadowColor.none())
-        val subtitle = Component.text().color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
-            .append(Component.text(build(if (y == 0) firstLineRaw.substring(0, x) else firstLineRaw)).font(DialogueFirstLineFont))
-            .append(Component.text(build(if (y == 1) secondLineRaw.substring(0, x) else "")).font(DialogueSecondLineFont))
-            .build()
-
-        showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)))
-
-        if ((if (y == 0) firstLineRaw.length else secondLineRaw.length) <= x++) {
-            x = 0
-            val b = ++y < 2
-            if (!b) also()
-            return@runTaskTimerAsync b
-        }
-        return@runTaskTimerAsync true
-    }
+    val title = Component.text(background).font(TitleFont).shadowColor(ShadowColor.none())
+    val subtitle = Component.text().color(NamedTextColor.WHITE).shadowColor(ShadowColor.none())
+        .append(Component.text(buildLine(firstLine)).font(DialogueFirstLineFont))
+        .append(Component.text(buildLine(secondLine)).font(DialogueSecondLineFont))
+        .build()
+    showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)))
 }
 
-fun Player.showInfoToast(message: Component) {
-    GuiBuilder.advancementToast()
-        .icon(ItemStack.of(Material.STICK).apply { itemMeta = itemMeta.apply { itemModel = Key.key(PLUGIN_ID, "info").toNamespacedKey() } })
-        .message(message)
-        .build(this)
+private fun typewriterEffect(firstLine: String, secondLine: String, tick: Int): Pair<String, String> {
+    fun getDisplayText(string: String, tick: Int): String {
+        var nonSpaceCount = 0
+        val pos = string.indices.firstOrNull {
+            if (!string[it].isWhitespace()) nonSpaceCount++
+            return@firstOrNull nonSpaceCount > tick
+        } ?: string.length
+        return string.substring(0, pos)
+    }
+
+    val firstLineNonSpaceCount = firstLine.count { !it.isWhitespace() }
+    return if (tick < firstLineNonSpaceCount) {
+        Pair(getDisplayText(firstLine, tick), "")
+    } else {
+        Pair(firstLine, getDisplayText(secondLine, tick - firstLineNonSpaceCount))
+    }
 }
 
 fun Player.focusItemStack(condition: (ItemStack) -> Boolean, focus: (Int) -> Unit = { index -> focusHotbarSlot(index) }): Boolean {
