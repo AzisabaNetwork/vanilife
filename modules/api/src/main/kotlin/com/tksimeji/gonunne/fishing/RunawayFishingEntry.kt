@@ -2,10 +2,9 @@ package com.tksimeji.gonunne.fishing
 
 import org.bukkit.entity.FishHook
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.util.noise.SimplexNoiseGenerator
 
-internal class RunawayFishingEntry(override val weight: Int, private val speed: Double, private val minSpeedNoise: Double, private val maxSpeedNoise: Double, private val lootFunction: (Player, FishHook) -> List<ItemStack>): FishingEntry {
+abstract class RunawayFishingEntry(private val speed: Double, private val minSpeedNoise: Double, private val maxSpeedNoise: Double): FishingEntry {
     private val noiseScaleFactor = maxSpeedNoise - minSpeedNoise
 
     override fun tick(player: Player, hook: FishHook, tickNumber: Int, noiseGenerator: SimplexNoiseGenerator) {
@@ -21,9 +20,5 @@ internal class RunawayFishingEntry(override val weight: Int, private val speed: 
         val speedNoise = (noiseGenerator.noise(tickNumber.toDouble()) * noiseScaleFactor).coerceIn(minSpeedNoise, maxSpeedNoise)
         val additionalVelocity = direction.multiply(speed * speedNoise)
         hook.velocity = hook.velocity.add(additionalVelocity)
-    }
-
-    override fun loot(player: Player, hook: FishHook): List<ItemStack> {
-        return lootFunction(player, hook)
     }
 }

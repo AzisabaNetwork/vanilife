@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -56,6 +57,13 @@ object CustomItemListener: Listener {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val itemStack = event.item
         itemStack?.customItemType()?.use(itemStack, event.player, event.action, event.clickedBlock, event.blockFace)
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onEntityPickupItem(event: EntityPickupItemEvent) {
+        val player = event.entity as? Player ?: return
+        val itemStack = event.item.itemStack
+        itemStack.customItemType()?.onPickup(itemStack, player)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

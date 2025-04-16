@@ -103,7 +103,15 @@ class FishingRunnable(private val player: Player, private val hook: FishHook): B
                 val dx = player.x - hook.x
                 val dy = player.y - hook.y
                 val dz = player.z - hook.z
-                val velocity = Vector(dx * 0.1, dy * 0.1 + sqrt(sqrt(dx * dx + dy * dy + dz * dz)) * 0.08, dz * 0.1)
+
+                val direction = Vector(dx, dy, dz)
+                val velocity = if (direction.lengthSquared() == 0.0) {
+                    Vector(0.0, 0.0, 0.0)
+                } else {
+                    direction.normalize().multiply(0.5).apply {
+                        y += sqrt(player.location.distance(hook.location)) * 0.05
+                    }
+                }
 
                 this.velocity = velocity
                 this.itemStack = itemStack

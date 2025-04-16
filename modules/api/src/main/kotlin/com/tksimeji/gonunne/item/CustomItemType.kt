@@ -40,6 +40,9 @@ interface CustomItemType: Keyed {
     fun onInOffHand(player: Player) {
     }
 
+    fun onPickup(itemStack: ItemStack, player: Player) {
+    }
+
     fun use(itemStack: ItemStack, player: Player, action: Action, block: Block?, face: BlockFace) {
     }
 }

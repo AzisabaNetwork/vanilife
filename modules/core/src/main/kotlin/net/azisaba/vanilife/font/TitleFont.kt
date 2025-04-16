@@ -10,7 +10,11 @@ object TitleFont: RegistryImpl<String, Char>(), Font {
 
     val DIALOGUE = register("dialogue", '\uE001')
 
-    val FOCUSED_SLOT = register("focused_slot", '\uE002')
+    val DIALOGUE_ANONYMOUS = register("dialogue_anonymous", '\uE002')
 
-    val SPACE_HOTBAR = register("space_hotbar", '\uE003')
+    val DIALOGUE_PIGGLE = register("dialogue_piggle", '\uE003')
+
+    val FOCUSED_SLOT = register("focused_slot", '\uE004')
+
+    val SPACE_HOTBAR = register("space_hotbar", '\uE005')
 }

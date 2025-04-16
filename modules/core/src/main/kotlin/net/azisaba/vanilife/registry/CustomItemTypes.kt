@@ -25,6 +25,7 @@ object CustomItemTypes: KeyedRegistryImpl<CustomItemType>() {
     val HORSE_MACKEREL = register(HorseMackerel)
     val JAPANESE_RADISH = register(JapaneseRadish)
     val KNIFE = register(Knife)
+    val LAVA_CANDY = register(LavaCandy)
     val LETTUCE = register(Lettuce)
     val MACKEREL = register(Mackerel)
     val MAGNITE = register(Magnite)

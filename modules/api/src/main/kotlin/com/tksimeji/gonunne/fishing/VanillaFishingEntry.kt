@@ -1,5 +1,8 @@
 package com.tksimeji.gonunne.fishing
 
+import net.azisaba.vanilife.PLUGIN_ID
+import net.kyori.adventure.key.Key
+import org.bukkit.Location
 import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
 import org.bukkit.enchantments.Enchantment
@@ -11,6 +14,12 @@ import org.bukkit.loot.LootTables
 import org.bukkit.util.noise.SimplexNoiseGenerator
 
 internal class VanillaFishingEntry(override val weight: Int): FishingEntry {
+    override val key: Key = Key.key(PLUGIN_ID, "vanilla")
+
+    override fun condition(player: Player, location: Location): Boolean {
+        return location.world.key() == Key.key("overworld")
+    }
+
     override fun tick(player: Player, hook: FishHook, tickNumber: Int, noiseGenerator: SimplexNoiseGenerator) {
     }
 

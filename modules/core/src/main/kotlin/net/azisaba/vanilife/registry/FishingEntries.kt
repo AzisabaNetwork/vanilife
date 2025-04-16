@@ -1,13 +1,14 @@
 package net.azisaba.vanilife.registry
 
-import com.tksimeji.gonunne.SimpleWeightedList
 import com.tksimeji.gonunne.fishing.FishingEntry
-import com.tksimeji.gonunne.item.createItemStack
+import com.tksimeji.gonunne.registry.impl.KeyedRegistryImpl
+import net.azisaba.vanilife.fishing.LavaCandyFishingEntry
+import net.azisaba.vanilife.fishing.MagniteFishingEntry
 
-object FishingEntries: SimpleWeightedList<FishingEntry>() {
-    val TUNA = add(FishingEntry.runaway(1, 0.1, 1.0, 3.0) { _, _ ->
-        return@runaway listOf(CustomItemTypes.TUNA.createItemStack())
-    })
+object FishingEntries: KeyedRegistryImpl<FishingEntry>() {
+    val LAVA_CANDY = register(LavaCandyFishingEntry)
 
-    val VANILLA = add(FishingEntry.vanilla(1))
+    val MAGNITE = register(MagniteFishingEntry)
+
+    val VANILLA = register(FishingEntry.vanilla(1))
 }

@@ -1,5 +1,6 @@
 package net.azisaba.vanilife.registry
 
+import com.tksimeji.gonunne.enchantment.createEnchantedBook
 import com.tksimeji.gonunne.item.CustomItemType
 import com.tksimeji.gonunne.item.Fruit
 import com.tksimeji.gonunne.item.createItemStack
@@ -61,6 +62,12 @@ object CustomRecipes: RegistryImpl<Key, Recipe>() {
         shape("I", "S")
         setIngredient('I', Material.IRON_INGOT)
         setIngredient('S', Material.STICK)
+    })
+
+    val MAGNITE_ENCHANTED_BOOK = register(ShapedRecipe(Key.key(PLUGIN_ID, "magnite_enchanted_book").toNamespacedKey(), CustomEnchantments.MAGNITE_MINING.createEnchantedBook()).apply {
+        shape("MMM", "MBM", "MMM")
+        setIngredient('M', CustomItemTypes.MAGNITE.createItemStack())
+        setIngredient('B', Material.BOOK)
     })
 
     val MAYONNAISE = register(ShapelessRecipe(Key.key(PLUGIN_ID, "mayonnaise").toNamespacedKey(), CustomItemTypes.MAYONNAISE.createItemStack()).apply {
