@@ -89,12 +89,15 @@ class Vanilife : JavaPlugin() {
         server.pluginManager.registerEvents(CustomEnchantmentListener, this)
         server.pluginManager.registerEvents(CustomItemListener, this)
         server.pluginManager.registerEvents(ExchangeListener, this)
+        server.pluginManager.registerEvents(FakeEntityListener, this)
         server.pluginManager.registerEvents(FishingListener, this)
+        // server.pluginManager.registerEvents(FurnaceListener, this)
         server.pluginManager.registerEvents(LootListener, this)
         server.pluginManager.registerEvents(RecipeListener, this)
         server.pluginManager.registerEvents(SaltLakeListener, this)
         server.pluginManager.registerEvents(VillagerListener, this)
 
+        // runTaskLaterAsync(CreakingRunnable.delay(), CreakingRunnable)
         runTaskTimerAsync(0, 1, FishingHudRunnable)
         runTaskTimerAsync(0, 1, HudRunnable)
 

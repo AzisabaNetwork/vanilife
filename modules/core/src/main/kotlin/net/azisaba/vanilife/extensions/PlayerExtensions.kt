@@ -29,6 +29,8 @@ import kotlin.random.Random
 
 private val DATABASE_CACHE_LEVEL = mutableMapOf<UUID, Int>()
 
+private val dialogueShowing = mutableSetOf<UUID>()
+
 var OfflinePlayer.lv: Int
     get() {
         if (DATABASE_CACHE_LEVEL.containsKey(uniqueId)) {
@@ -162,6 +164,8 @@ fun Player.showDialogue(component: Component, background: Char = TitleFont.DIALO
 }
 
 fun Player.showDialogue(firstLine: Component, secondLine: Component, background: Char = TitleFont.DIALOGUE, also: () -> Unit = {}) {
+    dialogueShowing.add(uniqueId)
+
     val firstLineString = GlobalTranslator.render(firstLine, locale()).plainText()
     val secondLineString = GlobalTranslator.render(secondLine, locale()).plainText()
 
@@ -173,7 +177,12 @@ fun Player.showDialogue(firstLine: Component, secondLine: Component, background:
         showDialogueDirect(typewriterEffect.first, typewriterEffect.second, background)
         tick++
         val b = typewriterEffect != Pair(firstLineString, secondLineString)
-        if (!b) runTaskLaterAsync(30) { also() }
+        if (!b) {
+            runTaskLaterAsync(30) {
+                also()
+                dialogueShowing.remove(uniqueId)
+            }
+        }
         return@runTaskTimerAsync b
     }
 }
@@ -205,6 +214,10 @@ private fun Player.showDialogueDirect(firstLine: String, secondLine: String, bac
         .append(Component.text(buildLine(secondLine)).font(DialogueSecondLineFont))
         .build()
     showTitle(Title.title(title, subtitle, Title.Times.times(Duration.ZERO, Duration.ofSeconds(2), Duration.ZERO)))
+}
+
+fun Player.hasSeenDialogue(): Boolean {
+    return dialogueShowing.contains(uniqueId)
 }
 
 private fun typewriterEffect(firstLine: String, secondLine: String, tick: Int): Pair<String, String> {
